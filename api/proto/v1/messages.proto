@@ -1,0 +1,30 @@
+syntax = "proto3";
+package message;
+
+message PingMsg {
+	string host_addr = 1;
+	uint32 msg_time_nano = 2;
+	string seed_node_addr = 3;
+}
+
+message PingMsgResp {
+	bool is_success = 1;
+}
+
+message TraceReport {
+	string from_host_addr = 1;
+	uint32 from_host_msg_time_nano = 2;
+	string to_host_addr = 3;
+	uint32 to_host_msg_time_nano = 4;
+	string seed_node_addr = 5;
+	bool is_transmission_success = 6;
+}
+
+message TraceReportResp {
+	bool is_success = 1;
+}
+
+service DistributedTracingService {
+	rpc PingNode(Ping) returns (PingResp);
+	rpc ReportNodeCheck(TraceReport) returns (TraceReportResp);
+}
