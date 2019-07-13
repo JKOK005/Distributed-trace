@@ -25,6 +25,6 @@ message TraceReportResp {
 }
 
 service DistributedTracingService {
-	rpc PingNode(Ping) returns (PingResp);
+	rpc PingNode(PingMsg) returns (PingMsgResp);
 	rpc ReportNodeCheck(TraceReport) returns (TraceReportResp);
 }

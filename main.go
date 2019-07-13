@@ -1,58 +1,49 @@
 package main
 
 import (
-	pb "distributed_tracing/pkg/api/proto"
 	"flag"
 	"fmt"
 	"log"
+	wk "Distributed-trace/pkg/service/v1"
 )
 
-type targets []string
-
 type Node interface {
-	start()
+	Register() 	error
+	Start() 	error
 }
 
-func (i *targets) String() string {
-	return "Node targets"
-}
-
-func (i *targets) Set(value string) error {
-	fmt.Println(value)
-	*i = append(*i, value)
-	return nil
-}
+const (
+	poll_timeout int32 = 5000 // ms
+)
 
 var (
 	node_type    *string
 	node_addr    *string
-	node_targets targets
 )
 
 func validateAllowableNodeTypes(n string) bool {
 	switch n {
-	case "seed", "worker", "transmitter":
+	case "worker", "transmitter":
 		return true
 	default:
 		return false
 	}
 }
 
-func assignNodeType(node_type string) Node {
+func assignNodeType(node_type string, poll_timeout int32) Node {
 	switch node_type {
-	case "seed":
-		return SeedNode{my_address: node_addr, target_addresses: node_targets}
 	case "worker":
-		return WorkerNode{my_address: node_addr, target_addresses: node_targets}
-	case "transmitter":
-		return TransmitterNode{my_address: node_addr, target_addresses: node_targets}
+		return wk.WorkerNode{My_address: *node_addr, Poll_timeout: poll_timeout}
+	//case "transmitter":
+	//	return wk.TransmitterNode{my_address: node_addr}
+	default:
+		return nil
 	}
 }
 
 func init() {
-	node_type = flag.String("type", "seed", "Defines the node type")
+	node_type = flag.String("type", "worker", "Defines the node type")
 	node_addr = flag.String("address", "localhost:8080", "Public node address")
-	flag.Var(&node_targets, "target", "Defines the nodes to propagate pings to, separated by ',' ")
 	flag.Parse()
 
 	if !validateAllowableNodeTypes(*node_type) {
@@ -65,6 +56,6 @@ func init() {
 
 func main() {
 	// go run main.go <node-type> <public IP addr>
-	node := assignNodeType(node_type)
-
+	node := assignNodeType(*node_type, poll_timeout)
+	node.Start()
 }
