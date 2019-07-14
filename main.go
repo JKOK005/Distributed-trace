@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync"
 	wk "Distributed-trace/pkg/service/v1"
 )
 
 type Node interface {
-	Register() 	error
 	Start() 	error
 }
 
@@ -56,6 +56,10 @@ func init() {
 
 func main() {
 	// go run main.go <node-type> <public IP addr>
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	node := assignNodeType(*node_type, poll_timeout)
-	node.Start()
+	go node.Start()
+	wg.Wait()
 }
