@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/json"
 	"log"
 	zk "github.com/samuel/go-zookeeper/zk"
 	"time"
@@ -46,20 +47,46 @@ func (s SdClient) registerNode(wn WorkerNode) error {
 	log.Println("Registering node address at ", wn.My_address)
 
 	full_path := root_path_zk + "/" + wn.My_address
-	_, err := s.conn.CreateProtectedEphemeralSequential(full_path, []byte("Worker"), zk.WorldACL(zk.PermAll))
+
+	data, err := json.Marshal(wn)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.conn.CreateProtectedEphemeralSequential(full_path, data, zk.WorldACL(zk.PermAll))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-//func (s SdClient) getNodes() (error) {
-//	/* Gets all nodes within path */
-//
-//}
+func (s SdClient) getNodesFromRoot(root_path string) ([]*WorkerNode, error) {
+	/* Gets all immediate child nodes that are associated with root_path */
+	log.Println(s.conn.Children(root_path))
+	childs, _, err := s.conn.Children(root_path)
+
+	if err != nil {
+		return nil, err
+	}
+	nodes := []*WorkerNode{}
+	for _, each_child := range childs {
+		child_path := root_path + "/" + each_child
+		data, _, err := s.conn.Get(child_path)
+		if err != nil {
+			return nil, err
+		}
+		node := new(WorkerNode)
+		err = json.Unmarshal(data, node)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, node)
+	}
+	return nodes, nil
+}
 
 func (wn WorkerNode) NewClient() (*SdClient, error) {
-	// Registers node with ZK cluster
+	/* Registers node with ZK cluster */
 	log.Println("Registering to ZK cluster under %s", root_path_zk)
 
 	client := new(SdClient)
@@ -91,6 +118,12 @@ func (wn WorkerNode) Start() error {
 
 	if err := client.registerNode(wn); err != nil {
 		panic(err)
+	}
+
+	if nodes, err := client.getNodesFromRoot(root_path_zk); err != nil {
+		panic(err)
+	} else {
+		log.Println(nodes)
 	}
 
 	return nil
