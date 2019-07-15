@@ -1,9 +1,11 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	zk "github.com/samuel/go-zookeeper/zk"
+	pb "Distributed-trace/pkg/api/proto"
 	"time"
 )
 
@@ -23,6 +25,8 @@ type WorkerNode struct {
 	My_address 		string
 	Poll_timeout 	int32
 }
+
+/* -------------- Node discovery -------------- */
 
 func (s SdClient) constructZkPath(path string) error {
 	log.Println("Creating node at ", path)
@@ -108,6 +112,23 @@ func (wn WorkerNode) NewClient() (*SdClient, error) {
 		}
 	}
 	return client, nil
+}
+
+/* -------------- Inter process communication -------------- */
+
+func (wn WorkerNode) dispatch(node *WorkerNode) error {
+	/* Starts communicating with other nodes via exposed grpc endpoints */
+	return nil
+}
+
+/* -------------- GRPC protocls -------------- */
+
+func (wn WorkerNode) PingMsgResp(ctx context.Context, ping_msg *pb.PingMsg) {
+
+}
+
+func (wn WorkerNode) registerListener() error {
+	/* Spawns grpc listener */
 }
 
 func (wn WorkerNode) Start() error {

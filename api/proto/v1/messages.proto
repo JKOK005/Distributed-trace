@@ -24,7 +24,7 @@ message TraceReportResp {
 	bool is_success = 1;
 }
 
-service DistributedTracingService {
+service DistributedTraceService {
 	rpc PingNode(PingMsg) returns (PingMsgResp);
 	rpc ReportNodeCheck(TraceReport) returns (TraceReportResp);
 }
