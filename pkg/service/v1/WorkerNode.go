@@ -2,8 +2,10 @@ package v1
 
 import (
 	"encoding/json"
+	pb "Distributed-trace/pkg/api/proto"
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -11,6 +13,7 @@ var (
 	root_path_zk 	string 		= "/distributed_trace"
 	servers_zk 		[]string 	= []string{"localhost:2181"}
 	conn_timeout 	int 		= 10
+	results_channel 			= make(chan *pb.TraceReport)
 )
 
 type SdClient struct {
@@ -42,9 +45,9 @@ func (s SdClient) checkPathExists(path string) (bool, error) {
 }
 
 
-func (s SdClient) registerNode(wn WorkerNode) error {
+func (s SdClient) registerNode(wn *WorkerNode) error {
 	/* Creates node as ephemeral to ZK cluster under root path */
-	log.Println("Registering node address at ", wn.My_address)
+	log.Println("Registering node address at", wn.My_address)
 
 	full_path := root_path_zk + "/" + wn.My_address
 
@@ -112,16 +115,24 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 
 func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
+	results_channel <- &pb.TraceReport{FromHostAddr:"SampleAddress9999"}
 	return nil
 }
 
-func (wn WorkerNode) Start() error {
+func (wn WorkerNode) dispatchList(nodes []*WorkerNode) error {
+	for _, each_node := range nodes {go wn.dispatch(each_node)}
+	check_chan := <-results_channel
+	log.Println(check_chan.FromHostAddr)
+	return nil
+}
+
+func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 	client, err := wn.newClient()
 	if err != nil {
 		panic(err)
 	}
 
-	if err := client.registerNode(wn); err != nil {
+	if err := client.registerNode(&wn); err != nil {
 		panic(err)
 	}
 
@@ -129,6 +140,8 @@ func (wn WorkerNode) Start() error {
 		panic(err)
 	} else {
 		go NodeListener{address:wn.My_address}.registerListener()
+		time.Sleep(5000000000) // 5 s
+		go wn.dispatchList(nodes)
 	}
 
 	return nil
