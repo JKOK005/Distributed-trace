@@ -2,29 +2,33 @@ syntax = "proto3";
 package message;
 
 message PingMsg {
-	string host_addr = 1;
-	uint32 msg_time_nano = 2;
-	string seed_node_addr = 3;
+	string hostAddr = 1;
+	uint32 msgTimeNano = 2;
+	string seedNodeAddr = 3;
 }
 
 message PingMsgResp {
-	bool is_success = 1;
+	bool isSuccess = 1;
 }
 
 message TraceReport {
-	string from_host_addr = 1;
-	uint32 from_host_msg_time_nano = 2;
-	string to_host_addr = 3;
-	uint32 to_host_msg_time_nano = 4;
-	string seed_node_addr = 5;
-	bool is_transmission_success = 6;
+	string fromHostAddr = 1;
+	uint32 fromHostMsgTimeNano = 2;
+	string toHostAddr = 3;
+	uint32 toHostMsgTimeNano = 4;
+	string seedNodeAddr = 5;
+	bool isTransmissionSuccess = 6;
 }
 
 message TraceReportResp {
-	bool is_success = 1;
+	bool isSuccess = 1;
 }
 
-service DistributedTraceService {
+service WorkerService {
+	rpc PingNode(PingMsg) returns (PingMsgResp);
+}
+
+service TransmitterService {
 	rpc PingNode(PingMsg) returns (PingMsgResp);
 	rpc ReportNodeCheck(TraceReport) returns (TraceReportResp);
 }

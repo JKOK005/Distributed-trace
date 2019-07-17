@@ -25,9 +25,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PingMsg struct {
-	HostAddr             string   `protobuf:"bytes,1,opt,name=host_addr,json=hostAddr,proto3" json:"host_addr,omitempty"`
-	MsgTimeNano          uint32   `protobuf:"varint,2,opt,name=msg_time_nano,json=msgTimeNano,proto3" json:"msg_time_nano,omitempty"`
-	SeedNodeAddr         string   `protobuf:"bytes,3,opt,name=seed_node_addr,json=seedNodeAddr,proto3" json:"seed_node_addr,omitempty"`
+	HostAddr             string   `protobuf:"bytes,1,opt,name=hostAddr,proto3" json:"hostAddr,omitempty"`
+	MsgTimeNano          uint32   `protobuf:"varint,2,opt,name=msgTimeNano,proto3" json:"msgTimeNano,omitempty"`
+	SeedNodeAddr         string   `protobuf:"bytes,3,opt,name=seedNodeAddr,proto3" json:"seedNodeAddr,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -80,7 +80,7 @@ func (m *PingMsg) GetSeedNodeAddr() string {
 }
 
 type PingMsgResp struct {
-	IsSuccess            bool     `protobuf:"varint,1,opt,name=is_success,json=isSuccess,proto3" json:"is_success,omitempty"`
+	IsSuccess            bool     `protobuf:"varint,1,opt,name=isSuccess,proto3" json:"isSuccess,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -119,12 +119,12 @@ func (m *PingMsgResp) GetIsSuccess() bool {
 }
 
 type TraceReport struct {
-	FromHostAddr          string   `protobuf:"bytes,1,opt,name=from_host_addr,json=fromHostAddr,proto3" json:"from_host_addr,omitempty"`
-	FromHostMsgTimeNano   uint32   `protobuf:"varint,2,opt,name=from_host_msg_time_nano,json=fromHostMsgTimeNano,proto3" json:"from_host_msg_time_nano,omitempty"`
-	ToHostAddr            string   `protobuf:"bytes,3,opt,name=to_host_addr,json=toHostAddr,proto3" json:"to_host_addr,omitempty"`
-	ToHostMsgTimeNano     uint32   `protobuf:"varint,4,opt,name=to_host_msg_time_nano,json=toHostMsgTimeNano,proto3" json:"to_host_msg_time_nano,omitempty"`
-	SeedNodeAddr          string   `protobuf:"bytes,5,opt,name=seed_node_addr,json=seedNodeAddr,proto3" json:"seed_node_addr,omitempty"`
-	IsTransmissionSuccess bool     `protobuf:"varint,6,opt,name=is_transmission_success,json=isTransmissionSuccess,proto3" json:"is_transmission_success,omitempty"`
+	FromHostAddr          string   `protobuf:"bytes,1,opt,name=fromHostAddr,proto3" json:"fromHostAddr,omitempty"`
+	FromHostMsgTimeNano   uint32   `protobuf:"varint,2,opt,name=fromHostMsgTimeNano,proto3" json:"fromHostMsgTimeNano,omitempty"`
+	ToHostAddr            string   `protobuf:"bytes,3,opt,name=toHostAddr,proto3" json:"toHostAddr,omitempty"`
+	ToHostMsgTimeNano     uint32   `protobuf:"varint,4,opt,name=toHostMsgTimeNano,proto3" json:"toHostMsgTimeNano,omitempty"`
+	SeedNodeAddr          string   `protobuf:"bytes,5,opt,name=seedNodeAddr,proto3" json:"seedNodeAddr,omitempty"`
+	IsTransmissionSuccess bool     `protobuf:"varint,6,opt,name=isTransmissionSuccess,proto3" json:"isTransmissionSuccess,omitempty"`
 	XXX_NoUnkeyedLiteral  struct{} `json:"-"`
 	XXX_unrecognized      []byte   `json:"-"`
 	XXX_sizecache         int32    `json:"-"`
@@ -198,7 +198,7 @@ func (m *TraceReport) GetIsTransmissionSuccess() bool {
 }
 
 type TraceReportResp struct {
-	IsSuccess            bool     `protobuf:"varint,1,opt,name=is_success,json=isSuccess,proto3" json:"is_success,omitempty"`
+	IsSuccess            bool     `protobuf:"varint,1,opt,name=isSuccess,proto3" json:"isSuccess,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -246,30 +246,27 @@ func init() {
 func init() { proto.RegisterFile("messages.proto", fileDescriptor_4dc296cbfe5ffcd5) }
 
 var fileDescriptor_4dc296cbfe5ffcd5 = []byte{
-	// 356 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xcb, 0x4f, 0xea, 0x40,
-	0x18, 0xc5, 0x53, 0xee, 0xbd, 0x3c, 0x3e, 0x5e, 0xf7, 0xce, 0x95, 0x80, 0x18, 0x13, 0xd2, 0xb8,
-	0x60, 0x61, 0x08, 0x41, 0xe3, 0x9e, 0xe8, 0xc2, 0x0d, 0xc4, 0x14, 0xf6, 0x4d, 0xe9, 0x7c, 0x96,
-	0x89, 0xe9, 0x4c, 0x33, 0xdf, 0xe0, 0x1f, 0xe2, 0xd6, 0x7f, 0xd6, 0x4c, 0x1f, 0x50, 0x91, 0x18,
-	0x97, 0x3d, 0x3d, 0xf3, 0x3b, 0x27, 0x67, 0x06, 0x3a, 0x31, 0x12, 0x05, 0x11, 0xd2, 0x24, 0xd1,
-	0xca, 0x28, 0x56, 0xcb, 0xbf, 0xdd, 0x04, 0x6a, 0x4f, 0x42, 0x46, 0x0b, 0x8a, 0xd8, 0x05, 0x34,
-	0xb6, 0x8a, 0x8c, 0x1f, 0x70, 0xae, 0x07, 0xce, 0xc8, 0x19, 0x37, 0xbc, 0xba, 0x15, 0xe6, 0x9c,
-	0x6b, 0xe6, 0x42, 0x3b, 0xa6, 0xc8, 0x37, 0x22, 0x46, 0x5f, 0x06, 0x52, 0x0d, 0x2a, 0x23, 0x67,
-	0xdc, 0xf6, 0x9a, 0x31, 0x45, 0x6b, 0x11, 0xe3, 0x32, 0x90, 0x8a, 0x5d, 0x41, 0x87, 0x10, 0xb9,
-	0x2f, 0x15, 0xc7, 0x8c, 0xf2, 0x2b, 0xa5, 0xb4, 0xac, 0xba, 0x54, 0x1c, 0x2d, 0xc9, 0xbd, 0x86,
-	0x66, 0x9e, 0xe8, 0x21, 0x25, 0xec, 0x12, 0x40, 0x90, 0x4f, 0xbb, 0x30, 0x44, 0xa2, 0x34, 0xb6,
-	0xee, 0x35, 0x04, 0xad, 0x32, 0xc1, 0x7d, 0xaf, 0x40, 0x73, 0xad, 0x83, 0x10, 0x3d, 0x4c, 0x94,
-	0x36, 0x36, 0xe3, 0x59, 0xab, 0xd8, 0x3f, 0x6e, 0xda, 0xb2, 0xea, 0x63, 0xd1, 0xf6, 0x16, 0xfa,
-	0x07, 0xd7, 0xa9, 0xde, 0xff, 0x0b, 0xfb, 0xa2, 0xd4, 0x7f, 0x04, 0x2d, 0xa3, 0x4a, 0xe4, 0xac,
-	0x3d, 0x18, 0xb5, 0xe7, 0x4e, 0xa1, 0x57, 0x38, 0x3e, 0x53, 0x7f, 0xa7, 0xd4, 0x7f, 0x99, 0x75,
-	0xf1, 0xed, 0x26, 0x7f, 0xbe, 0x6e, 0xc2, 0xee, 0xa0, 0x2f, 0xc8, 0x37, 0x3a, 0x90, 0x14, 0x0b,
-	0x22, 0xa1, 0xe4, 0x7e, 0x91, 0x6a, 0xba, 0x48, 0x4f, 0xd0, 0xba, 0xf4, 0xb7, 0x58, 0x67, 0x0a,
-	0xdd, 0xd2, 0x38, 0x3f, 0xd8, 0x73, 0xf6, 0xe6, 0xc0, 0xf9, 0x83, 0x20, 0xa3, 0xc5, 0x66, 0x67,
-	0x90, 0xdb, 0xd3, 0x42, 0x46, 0x2b, 0xd4, 0xaf, 0x22, 0x44, 0x36, 0x83, 0xba, 0xbd, 0x1b, 0xdb,
-	0x8b, 0xfd, 0x9d, 0xe4, 0x6f, 0x64, 0x92, 0x5f, 0xd7, 0xf0, 0xec, 0x58, 0x49, 0x03, 0xe7, 0xd0,
-	0xcd, 0xe2, 0xed, 0xa9, 0xfb, 0x2d, 0x86, 0x2f, 0xec, 0x60, 0x2c, 0xb5, 0x1b, 0x0e, 0x4e, 0xa9,
-	0x16, 0xb1, 0xa9, 0xa6, 0x8f, 0xf2, 0xe6, 0x23, 0x00, 0x00, 0xff, 0xff, 0x06, 0x4b, 0x3a, 0x3c,
-	0xa6, 0x02, 0x00, 0x00,
+	// 320 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x52, 0x4f, 0x4f, 0xfa, 0x40,
+	0x10, 0x4d, 0xf9, 0xfd, 0xe4, 0xcf, 0x20, 0xa2, 0xa3, 0x26, 0x84, 0x18, 0x43, 0x7a, 0x22, 0xd1,
+	0xa0, 0x41, 0xbf, 0x00, 0xe1, 0xe2, 0x05, 0x62, 0x0a, 0x89, 0xe7, 0xda, 0x8e, 0x65, 0x43, 0xda,
+	0x6d, 0x76, 0x56, 0xbf, 0x04, 0x5f, 0xda, 0xec, 0xb6, 0x40, 0x6b, 0x9b, 0x78, 0xf0, 0xf8, 0xde,
+	0xec, 0xbe, 0xf7, 0xf6, 0xcd, 0xc2, 0x59, 0x4c, 0xcc, 0x7e, 0x44, 0x3c, 0x49, 0x95, 0xd4, 0x12,
+	0x5b, 0x39, 0x76, 0xb7, 0xd0, 0x7a, 0x15, 0x49, 0xb4, 0xe0, 0x08, 0x87, 0xd0, 0xde, 0x48, 0xd6,
+	0xb3, 0x30, 0x54, 0x03, 0x67, 0xe4, 0x8c, 0x3b, 0xde, 0x01, 0xe3, 0x08, 0xba, 0x31, 0x47, 0x6b,
+	0x11, 0xd3, 0xd2, 0x4f, 0xe4, 0xa0, 0x31, 0x72, 0xc6, 0x3d, 0xaf, 0x48, 0xa1, 0x0b, 0xa7, 0x4c,
+	0x14, 0x2e, 0x65, 0x48, 0x56, 0xe1, 0x9f, 0x55, 0x28, 0x71, 0xee, 0x1d, 0x74, 0x73, 0x33, 0x8f,
+	0x38, 0xc5, 0x1b, 0xe8, 0x08, 0x5e, 0x7d, 0x06, 0x01, 0x31, 0x5b, 0xc7, 0xb6, 0x77, 0x24, 0xdc,
+	0x5d, 0x03, 0xba, 0x6b, 0xe5, 0x07, 0xe4, 0x51, 0x2a, 0x95, 0x36, 0x06, 0x1f, 0x4a, 0xc6, 0x2f,
+	0xe5, 0x88, 0x25, 0x0e, 0x1f, 0xe1, 0x72, 0x8f, 0x17, 0x95, 0xb8, 0x75, 0x23, 0xbc, 0x05, 0xd0,
+	0xf2, 0xa0, 0x99, 0x85, 0x2e, 0x30, 0x78, 0x0f, 0x17, 0x19, 0x2a, 0xea, 0xfd, 0xb7, 0x7a, 0xd5,
+	0x41, 0xa5, 0x84, 0x93, 0x6a, 0x09, 0xf8, 0x0c, 0xd7, 0x82, 0xd7, 0xca, 0x4f, 0x38, 0x16, 0xcc,
+	0x42, 0x26, 0xfb, 0x06, 0x9a, 0xb6, 0x81, 0xfa, 0xa1, 0xfb, 0x00, 0xfd, 0x42, 0x19, 0xbf, 0xd7,
+	0x37, 0x9d, 0x43, 0xef, 0x4d, 0xaa, 0x2d, 0xa9, 0x15, 0xa9, 0x2f, 0x11, 0x10, 0x4e, 0xa1, 0x6d,
+	0xca, 0x37, 0x39, 0xf0, 0x7c, 0x92, 0xef, 0x7f, 0x92, 0xef, 0x63, 0x78, 0xf5, 0x93, 0x31, 0x16,
+	0xd3, 0x9d, 0x03, 0x98, 0xa7, 0xd1, 0xfa, 0x4f, 0x52, 0x38, 0x83, 0x7e, 0x96, 0xdd, 0xdc, 0x9a,
+	0x6f, 0x28, 0xd8, 0xe2, 0xf1, 0x60, 0xe1, 0x69, 0xc3, 0x41, 0x1d, 0x6b, 0x24, 0xde, 0x9b, 0xf6,
+	0xef, 0x3e, 0x7d, 0x07, 0x00, 0x00, 0xff, 0xff, 0x8a, 0x5e, 0xfd, 0x17, 0xcd, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -280,108 +277,180 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// DistributedTracingServiceClient is the client API for DistributedTracingService service.
+// WorkerServiceClient is the client API for WorkerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type DistributedTracingServiceClient interface {
+type WorkerServiceClient interface {
 	PingNode(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsgResp, error)
-	ReportNodeCheck(ctx context.Context, in *TraceReport, opts ...grpc.CallOption) (*TraceReportResp, error)
 }
 
-type distributedTracingServiceClient struct {
+type workerServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewDistributedTracingServiceClient(cc *grpc.ClientConn) DistributedTracingServiceClient {
-	return &distributedTracingServiceClient{cc}
+func NewWorkerServiceClient(cc *grpc.ClientConn) WorkerServiceClient {
+	return &workerServiceClient{cc}
 }
 
-func (c *distributedTracingServiceClient) PingNode(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsgResp, error) {
+func (c *workerServiceClient) PingNode(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsgResp, error) {
 	out := new(PingMsgResp)
-	err := c.cc.Invoke(ctx, "/message.DistributedTracingService/PingNode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/message.WorkerService/PingNode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *distributedTracingServiceClient) ReportNodeCheck(ctx context.Context, in *TraceReport, opts ...grpc.CallOption) (*TraceReportResp, error) {
-	out := new(TraceReportResp)
-	err := c.cc.Invoke(ctx, "/message.DistributedTracingService/ReportNodeCheck", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// DistributedTracingServiceServer is the server API for DistributedTracingService service.
-type DistributedTracingServiceServer interface {
+// WorkerServiceServer is the server API for WorkerService service.
+type WorkerServiceServer interface {
 	PingNode(context.Context, *PingMsg) (*PingMsgResp, error)
-	ReportNodeCheck(context.Context, *TraceReport) (*TraceReportResp, error)
 }
 
-// UnimplementedDistributedTracingServiceServer can be embedded to have forward compatible implementations.
-type UnimplementedDistributedTracingServiceServer struct {
+// UnimplementedWorkerServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedWorkerServiceServer struct {
 }
 
-func (*UnimplementedDistributedTracingServiceServer) PingNode(ctx context.Context, req *PingMsg) (*PingMsgResp, error) {
+func (*UnimplementedWorkerServiceServer) PingNode(ctx context.Context, req *PingMsg) (*PingMsgResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PingNode not implemented")
 }
-func (*UnimplementedDistributedTracingServiceServer) ReportNodeCheck(ctx context.Context, req *TraceReport) (*TraceReportResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReportNodeCheck not implemented")
+
+func RegisterWorkerServiceServer(s *grpc.Server, srv WorkerServiceServer) {
+	s.RegisterService(&_WorkerService_serviceDesc, srv)
 }
 
-func RegisterDistributedTracingServiceServer(s *grpc.Server, srv DistributedTracingServiceServer) {
-	s.RegisterService(&_DistributedTracingService_serviceDesc, srv)
-}
-
-func _DistributedTracingService_PingNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _WorkerService_PingNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PingMsg)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DistributedTracingServiceServer).PingNode(ctx, in)
+		return srv.(WorkerServiceServer).PingNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/message.DistributedTracingService/PingNode",
+		FullMethod: "/message.WorkerService/PingNode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DistributedTracingServiceServer).PingNode(ctx, req.(*PingMsg))
+		return srv.(WorkerServiceServer).PingNode(ctx, req.(*PingMsg))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DistributedTracingService_ReportNodeCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+var _WorkerService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "message.WorkerService",
+	HandlerType: (*WorkerServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PingNode",
+			Handler:    _WorkerService_PingNode_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "messages.proto",
+}
+
+// TransmitterServiceClient is the client API for TransmitterService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type TransmitterServiceClient interface {
+	PingNode(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsgResp, error)
+	ReportNodeCheck(ctx context.Context, in *TraceReport, opts ...grpc.CallOption) (*TraceReportResp, error)
+}
+
+type transmitterServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewTransmitterServiceClient(cc *grpc.ClientConn) TransmitterServiceClient {
+	return &transmitterServiceClient{cc}
+}
+
+func (c *transmitterServiceClient) PingNode(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsgResp, error) {
+	out := new(PingMsgResp)
+	err := c.cc.Invoke(ctx, "/message.TransmitterService/PingNode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transmitterServiceClient) ReportNodeCheck(ctx context.Context, in *TraceReport, opts ...grpc.CallOption) (*TraceReportResp, error) {
+	out := new(TraceReportResp)
+	err := c.cc.Invoke(ctx, "/message.TransmitterService/ReportNodeCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TransmitterServiceServer is the server API for TransmitterService service.
+type TransmitterServiceServer interface {
+	PingNode(context.Context, *PingMsg) (*PingMsgResp, error)
+	ReportNodeCheck(context.Context, *TraceReport) (*TraceReportResp, error)
+}
+
+// UnimplementedTransmitterServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedTransmitterServiceServer struct {
+}
+
+func (*UnimplementedTransmitterServiceServer) PingNode(ctx context.Context, req *PingMsg) (*PingMsgResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PingNode not implemented")
+}
+func (*UnimplementedTransmitterServiceServer) ReportNodeCheck(ctx context.Context, req *TraceReport) (*TraceReportResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportNodeCheck not implemented")
+}
+
+func RegisterTransmitterServiceServer(s *grpc.Server, srv TransmitterServiceServer) {
+	s.RegisterService(&_TransmitterService_serviceDesc, srv)
+}
+
+func _TransmitterService_PingNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PingMsg)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransmitterServiceServer).PingNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/message.TransmitterService/PingNode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransmitterServiceServer).PingNode(ctx, req.(*PingMsg))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TransmitterService_ReportNodeCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TraceReport)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DistributedTracingServiceServer).ReportNodeCheck(ctx, in)
+		return srv.(TransmitterServiceServer).ReportNodeCheck(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/message.DistributedTracingService/ReportNodeCheck",
+		FullMethod: "/message.TransmitterService/ReportNodeCheck",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DistributedTracingServiceServer).ReportNodeCheck(ctx, req.(*TraceReport))
+		return srv.(TransmitterServiceServer).ReportNodeCheck(ctx, req.(*TraceReport))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _DistributedTracingService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "message.DistributedTracingService",
-	HandlerType: (*DistributedTracingServiceServer)(nil),
+var _TransmitterService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "message.TransmitterService",
+	HandlerType: (*TransmitterServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "PingNode",
-			Handler:    _DistributedTracingService_PingNode_Handler,
+			Handler:    _TransmitterService_PingNode_Handler,
 		},
 		{
 			MethodName: "ReportNodeCheck",
-			Handler:    _DistributedTracingService_ReportNodeCheck_Handler,
+			Handler:    _TransmitterService_ReportNodeCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
