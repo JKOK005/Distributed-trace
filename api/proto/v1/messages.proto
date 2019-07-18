@@ -3,8 +3,6 @@ package message;
 
 message PingMsg {
 	string hostAddr = 1;
-	uint32 msgTimeNano = 2;
-	string seedNodeAddr = 3;
 }
 
 message PingMsgResp {
@@ -16,7 +14,6 @@ message TraceReport {
 	uint32 fromHostMsgTimeNano = 2;
 	string toHostAddr = 3;
 	uint32 toHostMsgTimeNano = 4;
-	string seedNodeAddr = 5;
 	bool isTransmissionSuccess = 6;
 }
 

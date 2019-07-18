@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	pb "Distributed-trace/pkg/api/proto"
+	"google.golang.org/grpc"
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
 	"sync"
@@ -43,7 +45,6 @@ func (s SdClient) checkPathExists(path string) (bool, error) {
 	}
 	return exists, nil
 }
-
 
 func (s SdClient) registerNode(wn *WorkerNode) error {
 	/* Creates node as ephemeral to ZK cluster under root path */
@@ -115,14 +116,40 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 
 func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
+
+	if conn, err := grpc.Dial(node.My_address); err == nil {
+		defer conn.Close()
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(wn.Poll_timeout) * time.Second)
+		defer cancel()
+
+		client := pb.NewWorkerServiceClient(conn)
+		_, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: wn.My_address})
+
+		select {
+			case <-ctx.Done():
+				if (ctx.Err() == context.Canceled) {
+					// Request timed out. Report as timeout.
+
+				}else {
+					// Request succeeded
+					if err != nil {
+						panic(err)
+					}
+				}
+		}
+
+
+	}else {
+		panic(err)
+	}
+
 	results_channel <- &pb.TraceReport{FromHostAddr:"SampleAddress9999"}
 	return nil
 }
 
 func (wn WorkerNode) dispatchList(nodes []*WorkerNode) error {
 	for _, each_node := range nodes {go wn.dispatch(each_node)}
-	check_chan := <-results_channel
-	log.Println(check_chan.FromHostAddr)
 	return nil
 }
 
