@@ -13,7 +13,8 @@ type Node interface {
 }
 
 const (
-	poll_timeout int32 = 5000 // ms
+	poll_timeout 	int32 = 5000 // ms
+	poll_interval 	int32 = 10000 // ms
 )
 
 var (
@@ -33,7 +34,7 @@ func validateAllowableNodeTypes(n string) bool {
 func assignNodeType(node_type string, poll_timeout int32) Node {
 	switch node_type {
 	case "worker":
-		return wk.WorkerNode{My_address: *node_addr, Poll_timeout: poll_timeout}
+		return wk.WorkerNode{My_address: *node_addr, Poll_timeout: poll_timeout, Poll_interval: poll_interval}
 	//case "transmitter":
 	//	return wk.TransmitterNode{my_address: node_addr}
 	default:

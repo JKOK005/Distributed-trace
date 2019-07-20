@@ -15,7 +15,6 @@ var (
 	root_path_zk 	string 		= "/distributed_trace"
 	servers_zk 		[]string 	= []string{"localhost:2181"}
 	conn_timeout 	int 		= 10
-	results_channel 			= make(chan *pb.TraceReport)
 )
 
 type SdClient struct {
@@ -27,6 +26,7 @@ type SdClient struct {
 type WorkerNode struct {
 	My_address 		string
 	Poll_timeout 	int32
+	Poll_interval 	int32
 }
 
 func (s SdClient) constructZkPath(path string) error {
@@ -66,7 +66,6 @@ func (s SdClient) registerNode(wn *WorkerNode) error {
 
 func (s SdClient) getNodesFromRoot(root_path string) ([]*WorkerNode, error) {
 	/* Gets all immediate child nodes that are associated with root_path */
-	log.Println(s.conn.Children(root_path))
 	childs, _, err := s.conn.Children(root_path)
 
 	if err != nil {
@@ -116,35 +115,31 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 
 func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
+	log.Println("Attempting to communicate with: ", node.My_address)
 
-	if conn, err := grpc.Dial(node.My_address); err == nil {
+	if conn, err := grpc.Dial(node.My_address, grpc.WithInsecure()); err == nil {
 		defer conn.Close()
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(wn.Poll_timeout) * time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(wn.Poll_timeout) * time.Millisecond)
 		defer cancel()
 
 		client := pb.NewWorkerServiceClient(conn)
-		_, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: wn.My_address})
+		resp, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: wn.My_address})
 
-		select {
-			case <-ctx.Done():
-				if (ctx.Err() == context.Canceled) {
-					// Request timed out. Report as timeout.
-
-				}else {
-					// Request succeeded
-					if err != nil {
-						panic(err)
-					}
-				}
+		if ctx.Err() == context.DeadlineExceeded {
+			// Request timed out. Report as timeout.
+			log.Println("Request timed out: ", ctx.Err())
+		}else {
+			// Request succeeded
+			if err != nil {
+				panic(err)
+			}else{
+				log.Println("Request successful: ", resp)
+			}
 		}
-
-
 	}else {
 		panic(err)
 	}
-
-	results_channel <- &pb.TraceReport{FromHostAddr:"SampleAddress9999"}
 	return nil
 }
 
@@ -167,9 +162,14 @@ func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 		panic(err)
 	} else {
 		go NodeListener{address:wn.My_address}.registerListener()
-		time.Sleep(5000000000) // 5 s
-		go wn.dispatchList(nodes)
-	}
+		time.Sleep(1000000000) // 1 s
 
+		for {
+			select {
+				case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
+					go wn.dispatchList(nodes)
+				}
+		}
+	}
 	return nil
 }

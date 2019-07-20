@@ -1,10 +1,10 @@
 package v1
 
 import (
+	pb "Distributed-trace/pkg/api/proto"
 	"context"
 	"google.golang.org/grpc"
 	"log"
-	pb "Distributed-trace/pkg/api/proto"
 	"net"
 )
 
