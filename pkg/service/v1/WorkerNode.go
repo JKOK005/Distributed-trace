@@ -117,9 +117,10 @@ func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
 	log.Println("Attempting to communicate with: ", node.My_address)
 
-	if conn, err := grpc.Dial(node.My_address, grpc.WithInsecure()); err == nil {
+	if conn, err := grpc.Dial(node.My_address, grpc.WithInsecure()); err != nil {
+		log.Println(err)
+	} else {
 		defer conn.Close()
-
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(wn.Poll_timeout) * time.Millisecond)
 		defer cancel()
 
@@ -127,18 +128,16 @@ func (wn WorkerNode) dispatch(node *WorkerNode) error {
 		resp, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: wn.My_address})
 
 		if ctx.Err() == context.DeadlineExceeded {
-			// Request timed out. Report as timeout.
-			log.Println("Request timed out: ", ctx.Err())
+		// Request timed out. Report as timeout.
+		log.Println("Request timed out: ", ctx.Err())
 		}else {
 			// Request succeeded
 			if err != nil {
-				panic(err)
-			}else{
+				log.Println(err)
+			} else {
 				log.Println("Request successful: ", resp)
 			}
 		}
-	}else {
-		panic(err)
 	}
 	return nil
 }
@@ -158,18 +157,19 @@ func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 		panic(err)
 	}
 
-	if nodes, err := client.getNodesFromRoot(root_path_zk); err != nil {
-		panic(err)
-	} else {
-		go NodeListener{address:wn.My_address}.registerListener()
-		time.Sleep(1000000000) // 1 s
+	go NodeListener{address:wn.My_address}.registerListener()
+	time.Sleep(1000000000) // 1 s
 
-		for {
-			select {
-				case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-					go wn.dispatchList(nodes)
-				}
+	for{
+		select {
+		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
+			if nodes, err := client.getNodesFromRoot(root_path_zk); err != nil {
+				log.Fatal(err)
+			} else {
+				go wn.dispatchList(nodes)
+			}
 		}
 	}
+
 	return nil
 }
