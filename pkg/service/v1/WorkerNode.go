@@ -1,100 +1,48 @@
 package v1
 
 import (
+	pb "Distributed-trace/pkg/api/proto"
 	"context"
 	"encoding/json"
-	pb "Distributed-trace/pkg/api/proto"
-	"google.golang.org/grpc"
+	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
+	"google.golang.org/grpc"
 	"log"
 	"sync"
 	"time"
 )
 
-var (
-	root_path_zk 	string 		= "/distributed_trace"
-	servers_zk 		[]string 	= []string{"localhost:2181"}
-	conn_timeout 	int 		= 10
-)
-
-type SdClient struct {
-	zk_servers 	[]string
-	zk_root    	string
-	conn      	*zk.Conn
-}
-
 type WorkerNode struct {
 	My_address 		string
+	My_port 		int
 	Poll_timeout 	int32
 	Poll_interval 	int32
 }
 
-func (s SdClient) constructZkPath(path string) error {
-	log.Println("Creating node at ", path)
-	_, err := s.conn.Create(path, []byte(""), 0, zk.WorldACL(zk.PermAll))
-	if err != nil && err != zk.ErrNodeExists {
-		return err
-	}
-	return nil
-}
-
-func (s SdClient) checkPathExists(path string) (bool, error) {
-	exists, _, err := s.conn.Exists(path)
-	if err != nil {
-		return false, err
-	}
-	return exists, nil
-}
-
-func (s SdClient) registerNode(wn *WorkerNode) error {
-	/* Creates node as ephemeral to ZK cluster under root path */
-	log.Println("Registering node address at", wn.My_address)
-
-	full_path := root_path_zk + "/" + wn.My_address
-
-	data, err := json.Marshal(wn)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.conn.CreateProtectedEphemeralSequential(full_path, data, zk.WorldACL(zk.PermAll))
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s SdClient) getNodesFromRoot(root_path string) ([]*WorkerNode, error) {
-	/* Gets all immediate child nodes that are associated with root_path */
-	childs, _, err := s.conn.Children(root_path)
-
+func (wn WorkerNode) marshalOne(data []byte)(*WorkerNode, error) {
+	node := new(WorkerNode)
+	err := json.Unmarshal(data, node)
 	if err != nil {
 		return nil, err
 	}
+	return node, nil
+}
+
+func (wn WorkerNode) marshalAll(datas [][]byte)([]*WorkerNode, error) {
 	nodes := []*WorkerNode{}
-	for _, each_child := range childs {
-		child_path := root_path + "/" + each_child
-		data, _, err := s.conn.Get(child_path)
-		if err != nil {
+	for _, data := range datas {
+		if marshalled, err := wn.marshalOne(data); err != nil {
 			return nil, err
-		}
-		node := new(WorkerNode)
-		err = json.Unmarshal(data, node)
-		if err != nil {
-			return nil, err
-		}
-		nodes = append(nodes, node)
+		}else{nodes = append(nodes, marshalled)}
 	}
 	return nodes, nil
 }
 
 func (wn WorkerNode) newClient() (*SdClient, error) {
 	/* Registers node with ZK cluster */
-	log.Println("Registering to ZK cluster under %s", root_path_zk)
+	log.Println("Registering to ZK cluster")
 
 	client := new(SdClient)
-	client.zk_servers = servers_zk
-	client.zk_root = root_path_zk
 
 	conn, _, err := zk.Connect(servers_zk, time.Duration(conn_timeout) * time.Second)
 	if err != nil {
@@ -103,10 +51,10 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 
 	client.conn = conn
 
-	if exists, err := client.checkPathExists(root_path_zk); err != nil {
+	if exists, err := client.checkPathExists(fmt.Sprintf("%s/%s", root_path_zk, node_path)); err != nil {
 		return nil, err
 	} else if exists == false {
-		if err := client.constructZkPath(root_path_zk); err != nil {
+		if err := client.registerNode(fmt.Sprintf("%s/%s", root_path_zk, node_path), []byte{}); err != nil {
 			return nil, err
 		}
 	}
@@ -115,9 +63,9 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 
 func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
-	log.Println("Attempting to communicate with: ", node.My_address)
+	log.Println("Attempting to communicate with: ", node.My_address, node.My_port)
 
-	if conn, err := grpc.Dial(node.My_address, grpc.WithInsecure()); err != nil {
+	if conn, err := grpc.Dial(fmt.Sprintf("%s:%d", node.My_address, node.My_port), grpc.WithInsecure()); err != nil {
 		log.Println(err)
 	} else {
 		defer conn.Close()
@@ -125,7 +73,9 @@ func (wn WorkerNode) dispatch(node *WorkerNode) error {
 		defer cancel()
 
 		client := pb.NewWorkerServiceClient(conn)
-		resp, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: wn.My_address})
+
+		start := time.Now()
+		_, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port)})
 
 		if ctx.Err() == context.DeadlineExceeded {
 		// Request timed out. Report as timeout.
@@ -135,7 +85,8 @@ func (wn WorkerNode) dispatch(node *WorkerNode) error {
 			if err != nil {
 				log.Println(err)
 			} else {
-				log.Println("Request successful: ", resp)
+				end := time.Now()
+				log.Println(fmt.Sprintf("Response received in %d ns", end.Nanosecond() - start.Nanosecond()))
 			}
 		}
 	}
@@ -153,23 +104,30 @@ func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 		panic(err)
 	}
 
-	if err := client.registerNode(&wn); err != nil {
-		panic(err)
+	data, _ := json.Marshal(wn)
+
+	if err := client.registerEphemeralNode(fmt.Sprintf("%s/%s/%s:%d",
+														root_path_zk, node_path, wn.My_address, wn.My_port), data); err != nil {
+		log.Fatal(err)
 	}
 
-	go NodeListener{address:wn.My_address}.registerListener()
-	time.Sleep(1000000000) // 1 s
+	go NodeListener {address:fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)}.registerListener()
+	time.Sleep(100000000)
 
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if nodes, err := client.getNodesFromRoot(root_path_zk); err != nil {
+			if node_paths, err := client.getChildrenNodes(fmt.Sprintf("%s/%s", root_path_zk, node_path)); err != nil {
 				log.Fatal(err)
 			} else {
-				go wn.dispatchList(nodes)
+				if unmarshalled_nodes, err := client.getNodeValues(node_paths); err != nil {
+					log.Fatal(err)
+				} else {
+					marshalled_nodes, _ := wn.marshalAll(unmarshalled_nodes)
+					go wn.dispatchList(marshalled_nodes)
+				}
 			}
 		}
 	}
-
 	return nil
 }

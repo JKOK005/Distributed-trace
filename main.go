@@ -20,6 +20,7 @@ const (
 var (
 	node_type    *string
 	node_addr    *string
+	node_port 	 *int
 )
 
 func validateAllowableNodeTypes(n string) bool {
@@ -34,7 +35,10 @@ func validateAllowableNodeTypes(n string) bool {
 func assignNodeType(node_type string, poll_timeout int32) Node {
 	switch node_type {
 	case "worker":
-		return wk.WorkerNode{My_address: *node_addr, Poll_timeout: poll_timeout, Poll_interval: poll_interval}
+		return wk.WorkerNode { 	My_address: *node_addr,
+								My_port: *node_port,
+							 	Poll_timeout: poll_timeout,
+							 	Poll_interval: poll_interval}
 	//case "transmitter":
 	//	return wk.TransmitterNode{my_address: node_addr}
 	default:
@@ -44,14 +48,15 @@ func assignNodeType(node_type string, poll_timeout int32) Node {
 
 func init() {
 	node_type = flag.String("type", "worker", "Defines the node type")
-	node_addr = flag.String("address", "localhost:8080", "Public node address")
+	node_addr = flag.String("address", "localhost", "Public node address")
+	node_port = flag.Int("port", 8000, "Public node port")
 	flag.Parse()
 
 	if !validateAllowableNodeTypes(*node_type) {
 		panic(fmt.Sprintf("Node type not allowed: %s", *node_type))
 	}
 
-	log.SetPrefix(fmt.Sprintf("%s (%s): ", *node_addr, *node_type))
+	log.SetPrefix(fmt.Sprintf("%s (%s:%d): ", *node_addr, *node_type, *node_port))
 	log.Println("Starting node as type", *node_type)
 }
 

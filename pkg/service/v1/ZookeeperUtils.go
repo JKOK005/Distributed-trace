@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
@@ -9,7 +8,7 @@ import (
 
 var (
 	root_path_zk 	string 		= "/distributed_trace"
-	node_path 		string 		= "/nodes"
+	node_path 		string 		= "nodes"
 	servers_zk 		[]string 	= []string{"localhost:2181"}
 	conn_timeout 	int 		= 10
 )
@@ -30,15 +29,36 @@ func (s SdClient) checkPathExists(path string) (bool, error) {
 	return exists, nil
 }
 
+func (s SdClient) constructNode(path string) error {
+	/*
+		Checks if node exists at path
+		Else attempts to create one with data as empty
+	*/
+	if exists, err := s.checkPathExists(path); err != nil {
+		return err
+	} else if exists == false {
+		_, err := s.conn.Create(path, []byte{}, 0, zk.WorldACL(zk.PermAll))
+		if err != nil && err != zk.ErrNodeExists {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s SdClient) constructNodeFromNested(path string, delimiter string) error {
+	/*
+		Creates a ZK path of nested nodes from path and delimiter
+		Path 		- /distributed_trace/nodes
+		Demiliter 	- '/'
+	*/
+
+}
+
 func (s SdClient) registerNode(client_path string, data []byte) error {
 	/* Creates node to ZK cluster under root path */
 	log.Println("Registering node address at", client_path)
 	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, client_path)
-	_, err := s.conn.Create(full_path, data, 0, zk.WorldACL(zk.PermAll))
-	if err != nil && err != zk.ErrNodeExists {
-		return err
-	}
-	return nil
+	return s.constructNodeFromNested(full_path, "/")
 }
 
 func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
@@ -52,25 +72,20 @@ func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
 	return nil
 }
 
-func (s SdClient) getNodeValues (node_type GenericNode) func (node_paths []string) ([]*GenericNode, error) {
+func (s SdClient) getNodeValues (node_paths []string) ([][]byte, error) {
 	/* Passes in a list of node paths and returns the value of the node */
+	values := [][]byte{}
 
-	return func(node_paths []string) ([]*GenericNode, error){
-		nodes := []*GenericNode{}
-		for _, child_path := range node_paths {
-			data, _, err := s.conn.Get(child_path)
-			if err != nil {
-				return nil, err
-			}
-			err = json.Unmarshal(data, node_type)
-			if err != nil {
-				return nil, err
-			}
-			nodes = append(nodes, &node_type)
+	for _, child_path := range node_paths {
+		data, _, err := s.conn.Get(child_path)
+		if err != nil {
+			return nil, err
 		}
-		return nodes, nil
+		values = append(values, data)
 	}
+	return values, nil
 }
+
 
 func (s SdClient) getChildrenNodes(parent_path string) ([]string, error) {
 	/* Gets all immediate child nodes that are associated with root_path */
