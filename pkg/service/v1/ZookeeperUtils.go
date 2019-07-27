@@ -82,8 +82,8 @@ func (s SdClient) constructNodesInPath(path string, delimiter string, data []byt
 
 func (s SdClient) registerNode(client_path string, data []byte) error {
 	/* Registers node at client_path with data */
-	log.Println("Registering node address at", client_path)
 	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, client_path)
+	log.Println("Registering node address at", full_path)
 	return s.constructNodesInPath(full_path, "/", data)
 }
 
@@ -92,8 +92,8 @@ func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
 		Registers ephemeral node at client_path with data
 		If intermediate paths do not exist, we simply create them as a permanent node with empty data
 	*/
-	log.Println("Registering worker ephemeral node address at", client_path)
 	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, client_path)
+	log.Println("Registering worker ephemeral node address at", full_path)
 
 	full_path_without_last_slice := strings.Split(full_path, "/")
 	full_path_without_last := strings.Join(full_path_without_last_slice[ : len(full_path_without_last_slice)-1], "/")
