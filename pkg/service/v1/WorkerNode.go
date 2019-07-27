@@ -8,7 +8,6 @@ import (
 	"github.com/samuel/go-zookeeper/zk"
 	"google.golang.org/grpc"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -41,23 +40,12 @@ func (wn WorkerNode) marshalAll(datas [][]byte)([]*WorkerNode, error) {
 func (wn WorkerNode) newClient() (*SdClient, error) {
 	/* Registers node with ZK cluster */
 	log.Println("Registering to ZK cluster")
-
 	client := new(SdClient)
-
 	conn, _, err := zk.Connect(servers_zk, time.Duration(conn_timeout) * time.Second)
-	if err != nil {
-		return nil, err
-	}
+	if err != nil {return nil, err}
 
+	log.Println("Successfully connected to ZK at", servers_zk)
 	client.conn = conn
-
-	if exists, err := client.checkPathExists(fmt.Sprintf("%s/%s", root_path_zk, node_path)); err != nil {
-		return nil, err
-	} else if exists == false {
-		if err := client.registerNode(fmt.Sprintf("%s/%s", root_path_zk, node_path), []byte{}); err != nil {
-			return nil, err
-		}
-	}
 	return client, nil
 }
 
@@ -98,12 +86,12 @@ func (wn WorkerNode) dispatchList(nodes []*WorkerNode) error {
 	return nil
 }
 
-func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
+func (wn WorkerNode) Start() error {
 	client, err := wn.newClient()
-	if err != nil {return err}
+	if err != nil {log.Fatal(err)}
 
 	data, _ := json.Marshal(wn)
-	if err := client.registerEphemeralNode(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port), data); err != nil {return err}
+	if err := client.RegisterEphemeralNode(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port), data); err != nil {log.Fatal(err)}
 
 	go NodeListener {address:fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)}.registerListener()
 	time.Sleep(100000000)
@@ -111,11 +99,11 @@ func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if node_paths, err := client.getChildrenPaths(node_path); err != nil {
-				return err
+			if node_paths, err := client.GetChildrenPaths(""); err != nil {
+				log.Println(err)
 			} else {
-				if unmarshalled_nodes, err := client.getNodeValues(node_paths); err != nil {
-					return err
+				if unmarshalled_nodes, err := client.GetNodeValues(node_paths); err != nil {
+					log.Println(err)
 				} else {
 					marshalled_nodes, _ := wn.marshalAll(unmarshalled_nodes)
 					go wn.dispatchList(marshalled_nodes)

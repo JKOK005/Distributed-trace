@@ -9,7 +9,7 @@ import (
 )
 
 type Node interface {
-	Start(*sync.WaitGroup) 	error
+	Start() 	error
 }
 
 const (
@@ -66,6 +66,6 @@ func main() {
 
 	wg.Add(1)
 	node := assignNodeType(*node_type, poll_timeout)
-	go node.Start(&wg)
+	go node.Start()
 	wg.Wait()
 }
