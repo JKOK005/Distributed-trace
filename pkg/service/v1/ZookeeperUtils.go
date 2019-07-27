@@ -80,14 +80,19 @@ func (s SdClient) constructNodesInPath(path string, delimiter string, data []byt
 	return nil
 }
 
-func (s SdClient) registerNode(client_path string, data []byte) error {
+func (s SdClient) CheckRelativePathExists(path string) (bool, error) {
+	/* Checks if path relative to root_path/node_path exists */
+	return s.checkPathExists(fmt.Sprintf("%s/%s/%s", path))
+}
+
+func (s SdClient) RegisterNode(client_path string, data []byte) error {
 	/* Registers node at client_path with data */
 	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, client_path)
 	log.Println("Registering node address at", full_path)
 	return s.constructNodesInPath(full_path, "/", data)
 }
 
-func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
+func (s SdClient) RegisterEphemeralNode(client_path string, data []byte) error {
 	/*
 		Registers ephemeral node at client_path with data
 		If intermediate paths do not exist, we simply create them as a permanent node with empty data
@@ -103,7 +108,7 @@ func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
 	return nil
 }
 
-func (s SdClient) getNodeValues (from_path []string) ([][]byte, error) {
+func (s SdClient) GetNodeValues (from_path []string) ([][]byte, error) {
 	/* Passes in a list of node paths and returns the value of the node */
 	values := [][]byte{}
 	for _, child_path := range from_path {
@@ -115,7 +120,7 @@ func (s SdClient) getNodeValues (from_path []string) ([][]byte, error) {
 	return values, nil
 }
 
-func (s SdClient) getChildrenPaths(from_path string) ([]string, error) {
+func (s SdClient) GetChildrenPaths(from_path string) ([]string, error) {
 	/* Gets all immediate child nodes that are associated with root_path/node_path */
 	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, from_path)
 	childs, _, err := s.conn.Children(full_path)
