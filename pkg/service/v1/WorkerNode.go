@@ -100,16 +100,10 @@ func (wn WorkerNode) dispatchList(nodes []*WorkerNode) error {
 
 func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 	client, err := wn.newClient()
-	if err != nil {
-		panic(err)
-	}
+	if err != nil {return err}
 
 	data, _ := json.Marshal(wn)
-
-	if err := client.registerEphemeralNode(fmt.Sprintf("%s/%s/%s:%d",
-														root_path_zk, node_path, wn.My_address, wn.My_port), data); err != nil {
-		log.Fatal(err)
-	}
+	if err := client.registerEphemeralNode(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port), data); err != nil {return err}
 
 	go NodeListener {address:fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)}.registerListener()
 	time.Sleep(100000000)
@@ -117,11 +111,11 @@ func (wn WorkerNode) Start(wg *sync.WaitGroup) error {
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if node_paths, err := client.getChildrenNodes(fmt.Sprintf("%s/%s", root_path_zk, node_path)); err != nil {
-				log.Fatal(err)
+			if node_paths, err := client.getChildrenPaths(node_path); err != nil {
+				return err
 			} else {
 				if unmarshalled_nodes, err := client.getNodeValues(node_paths); err != nil {
-					log.Fatal(err)
+					return err
 				} else {
 					marshalled_nodes, _ := wn.marshalAll(unmarshalled_nodes)
 					go wn.dispatchList(marshalled_nodes)
