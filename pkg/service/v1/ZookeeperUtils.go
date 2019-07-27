@@ -103,27 +103,22 @@ func (s SdClient) registerEphemeralNode(client_path string, data []byte) error {
 	return nil
 }
 
-func (s SdClient) getNodeValues (node_paths []string) ([][]byte, error) {
+func (s SdClient) getNodeValues (from_path []string) ([][]byte, error) {
 	/* Passes in a list of node paths and returns the value of the node */
 	values := [][]byte{}
-
-	for _, child_path := range node_paths {
-		data, _, err := s.conn.Get(child_path)
-		if err != nil {
-			return nil, err
-		}
+	for _, child_path := range from_path {
+		full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, child_path)
+		data, _, err := s.conn.Get(full_path)
+		if err != nil {return nil, err}
 		values = append(values, data)
 	}
 	return values, nil
 }
 
-
-func (s SdClient) getChildrenNodes(parent_path string) ([]string, error) {
-	/* Gets all immediate child nodes that are associated with root_path */
-	childs, _, err := s.conn.Children(parent_path)
-
-	if err != nil {
-		return nil, err
-	}
+func (s SdClient) getChildrenPaths(from_path string) ([]string, error) {
+	/* Gets all immediate child nodes that are associated with root_path/node_path */
+	full_path := fmt.Sprintf("%s/%s/%s", root_path_zk, node_path, from_path)
+	childs, _, err := s.conn.Children(full_path)
+	if err != nil {return nil, err}
 	return childs, nil
 }
