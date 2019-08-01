@@ -9,18 +9,18 @@ import (
 )
 
 type NodeListener struct {
-	address string
+	Address string
 }
 
 func (nlis NodeListener) PingNode(ctx context.Context, ping_msg *pb.PingMsg) (*pb.PingMsgResp, error) {
 	return &pb.PingMsgResp{IsSuccess : true}, nil
 }
 
-func (nlis NodeListener) registerListener() {
+func (nlis NodeListener) RegisterListener() {
 	/* Spawns grpc listener */
-	log.Println("Spawning listener on", nlis.address)
+	log.Println("Spawning listener on", nlis.Address)
 
-	lis, err := net.Listen("tcp", nlis.address)
+	lis, err := net.Listen("tcp", nlis.Address)
 	if err != nil {
 		panic(err)
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	wk "Distributed-trace/pkg/service/v1"
+	pkg "Distributed-trace/pkg/service/v1"
 )
 
 type Node interface {
@@ -32,20 +32,6 @@ func validateAllowableNodeTypes(n string) bool {
 	}
 }
 
-func assignNodeType(node_type string, poll_timeout int32) Node {
-	switch node_type {
-	case "worker":
-		return wk.WorkerNode { 	My_address: *node_addr,
-								My_port: *node_port,
-							 	Poll_timeout: poll_timeout,
-							 	Poll_interval: poll_interval}
-	//case "transmitter":
-	//	return wk.TransmitterNode{my_address: node_addr}
-	default:
-		return nil
-	}
-}
-
 func init() {
 	node_type = flag.String("type", "worker", "Defines the node type")
 	node_addr = flag.String("address", "localhost", "Public node address")
@@ -65,7 +51,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	node := assignNodeType(*node_type, poll_timeout)
-	go node.Start()
+	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", *node_addr, *node_port)}.RegisterListener()
+	go pkg.WorkerNode {My_address: *node_addr, My_port: *node_port, Poll_timeout: poll_timeout, Poll_interval: poll_interval}.Start()
 	wg.Wait()
 }

@@ -93,9 +93,6 @@ func (wn WorkerNode) Start() error {
 	data, _ := json.Marshal(wn)
 	if err := client.RegisterEphemeralNode(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port), data); err != nil {log.Fatal(err)}
 
-	go NodeListener {address:fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)}.registerListener()
-	time.Sleep(100000000)
-
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
