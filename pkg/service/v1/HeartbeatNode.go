@@ -11,15 +11,16 @@ import (
 	"time"
 )
 
-type WorkerNode struct {
+type HeartbeatNode struct {
 	My_address 		string
 	My_port 		int
 	Poll_timeout 	int32
 	Poll_interval 	int32
+	ReportChannel 	chan *pb.TraceReport
 }
 
-func (wn WorkerNode) marshalOne(data []byte)(*WorkerNode, error) {
-	node := new(WorkerNode)
+func (wn HeartbeatNode) marshalOne(data []byte)(*HeartbeatNode, error) {
+	node := new(HeartbeatNode)
 	err := json.Unmarshal(data, node)
 	if err != nil {
 		return nil, err
@@ -27,8 +28,8 @@ func (wn WorkerNode) marshalOne(data []byte)(*WorkerNode, error) {
 	return node, nil
 }
 
-func (wn WorkerNode) marshalAll(datas [][]byte)([]*WorkerNode, error) {
-	nodes := []*WorkerNode{}
+func (wn HeartbeatNode) marshalAll(datas [][]byte)([]*HeartbeatNode, error) {
+	nodes := []*HeartbeatNode{}
 	for _, data := range datas {
 		if marshalled, err := wn.marshalOne(data); err != nil {
 			return nil, err
@@ -37,7 +38,7 @@ func (wn WorkerNode) marshalAll(datas [][]byte)([]*WorkerNode, error) {
 	return nodes, nil
 }
 
-func (wn WorkerNode) newClient() (*SdClient, error) {
+func (wn HeartbeatNode) newClient() (*SdClient, error) {
 	/* Registers node with ZK cluster */
 	log.Println("Registering to ZK cluster")
 	client := new(SdClient)
@@ -49,7 +50,7 @@ func (wn WorkerNode) newClient() (*SdClient, error) {
 	return client, nil
 }
 
-func (wn WorkerNode) dispatch(node *WorkerNode) error {
+func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
 	/* Starts communicating with other nodes via exposed grpc endpoints */
 	log.Println("Attempting to communicate with: ", node.My_address, node.My_port)
 
@@ -81,12 +82,12 @@ func (wn WorkerNode) dispatch(node *WorkerNode) error {
 	return nil
 }
 
-func (wn WorkerNode) dispatchList(nodes []*WorkerNode) error {
+func (wn HeartbeatNode) dispatchList(nodes []*HeartbeatNode) error {
 	for _, each_node := range nodes {go wn.dispatch(each_node)}
 	return nil
 }
 
-func (wn WorkerNode) Start() error {
+func (wn HeartbeatNode) Start() {
 	client, err := wn.newClient()
 	if err != nil {log.Fatal(err)}
 
@@ -108,5 +109,4 @@ func (wn WorkerNode) Start() error {
 			}
 		}
 	}
-	return nil
 }
