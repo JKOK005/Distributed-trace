@@ -97,7 +97,7 @@ func (wn HeartbeatNode) Start() {
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if node_paths, err := client.GetChildrenPaths(""); err != nil {
+			if node_paths, err := client.GetHeartBeatNodePaths(""); err != nil {
 				log.Println(err)
 			} else {
 				if unmarshalled_nodes, err := client.GetNodeValues(node_paths); err != nil {

@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	root_path_zk 	string 		= "distributed_trace"
-	node_path 		string 		= "nodes"
-	sink_path 		string 		= "sinks"
-	servers_zk 		[]string 	= []string{"localhost:2181"}
-	conn_timeout 	int 		= 10
+	root_path_zk 		string 		= "distributed_trace"
+	heartbeatnode_path 	string 		= "heart_beat_nodes"
+	sink_path 			string 		= "sinks"
+	servers_zk 			[]string 	= []string{"localhost:2181"}
+	conn_timeout 		int 		= 10
 )
 
 type SdClient struct {
@@ -80,9 +80,16 @@ func (s SdClient) constructNodesInPath(path string, delimiter string, data []byt
 	return nil
 }
 
-func (s SdClient) fullPath(next_path string) string {
-	if next_path == "" {return fmt.Sprintf("/%s/%s", root_path_zk, node_path)}
-	return fmt.Sprintf("/%s/%s/%s", root_path_zk, node_path, next_path)
+func (s SdClient) fullPath(from_path string) string {
+	if from_path == "" {return root_path_zk}
+	return fmt.Sprintf("/%s/%s", root_path_zk, from_path)
+}
+
+func (s SdClient) getNodePaths(from_path string) ([]string, error) {
+	log.Println("GetNodePaths called at", from_path)
+	childs, _, err := s.conn.Children(from_path)
+	if err != nil {return nil, err}
+	return childs, nil
 }
 
 func (s SdClient) CheckRelativePathExists(path string) (bool, error) {
@@ -125,11 +132,14 @@ func (s SdClient) GetNodeValues (from_path []string) ([][]byte, error) {
 	return values, nil
 }
 
-func (s SdClient) GetChildrenPaths(from_path string) ([]string, error) {
-	/* Gets all immediate child nodes that are associated with root_path/node_path */
-	full_path := s.fullPath(from_path)
-	log.Println("GetChildrenPaths at", full_path)
-	childs, _, err := s.conn.Children(full_path)
-	if err != nil {return nil, err}
-	return childs, nil
+func (s SdClient) GetHeartBeatNodePaths(from_path string) ([]string, error) {
+	/* Gets all immediate heart beat node paths */
+	full_path := s.fullPath(fmt.Sprintf("%s/%s", heartbeatnode_path, from_path))
+	return s.getNodePaths(full_path)
+}
+
+func (s SdClient) GetSinkNodePaths(from_path string) ([]string, error) {
+	/* Gets all immediate sink nodes paths */
+	full_path := s.fullPath(fmt.Sprintf("%s/%s", sink_path, from_path))
+	return s.getNodePaths(full_path)
 }
