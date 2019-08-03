@@ -15,7 +15,16 @@ type HeartbeatNode struct {
 	My_port 		int
 	Poll_timeout 	int32
 	Poll_interval 	int32
-	ReportChannel 	chan *pb.TraceReport
+}
+
+var (
+	reportChannel = make(chan *pb.TraceReport)
+	heartbeatnode_path = "heart_beat_nodes"
+)
+
+func getFullPath(from_path string) (string) {
+	if from_path == "" {return fmt.Sprintf("/%s/%s", root_path_zk, heartbeatnode_path)}
+	return fmt.Sprintf("/%s/%s/%s", root_path_zk, heartbeatnode_path, from_path)
 }
 
 func (wn HeartbeatNode) marshalOne(data []byte)(*HeartbeatNode, error) {
@@ -79,19 +88,21 @@ func (wn HeartbeatNode) Start() {
 	if err != nil {log.Fatal(err)}
 
 	data, _ := json.Marshal(wn)
-	if err := client.RegisterEphemeralNode(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port), data); err != nil {log.Fatal(err)}
+	if err := client.RegisterEphemeralNode(getFullPath(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)), data); err != nil {log.Fatal(err)}
 
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if node_paths, err := client.GetHeartBeatNodePaths(""); err != nil {
+			if node_paths, err := client.GetNodePaths(getFullPath("")); err != nil {
 				log.Println(err)
 			} else {
-				if unmarshalled_nodes, err := client.GetNodeValues(node_paths); err != nil {
-					log.Println(err)
-				} else {
-					marshalled_nodes, _ := wn.marshalAll(unmarshalled_nodes)
-					go wn.dispatchList(marshalled_nodes)
+				for _, node_path := range node_paths {
+					if unmarshalled_node, err := client.GetNodeValue(getFullPath(node_path)); err != nil {
+						log.Println(err)
+					} else {
+						marshalled_node, _ := wn.marshalOne(unmarshalled_node)
+						go wn.dispatch(marshalled_node)
+					}
 				}
 			}
 		}

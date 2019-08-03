@@ -1,11 +1,11 @@
 package main
 
 import (
+	pkg "Distributed-trace/pkg/service/v1"
 	"flag"
 	"fmt"
 	"log"
 	"sync"
-	pkg "Distributed-trace/pkg/service/v1"
 )
 
 type Node interface {
@@ -51,7 +51,14 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
+
 	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", *node_addr, *node_port)}.RegisterListener()
-	go pkg.WorkerNode {My_address: *node_addr, My_port: *node_port, Poll_timeout: poll_timeout, Poll_interval: poll_interval}.Start()
+
+	go pkg.HeartbeatNode {	My_address: *node_addr,
+							My_port: *node_port,
+							Poll_timeout: poll_timeout,
+							Poll_interval: poll_interval,
+							}.Start()
+
 	wg.Wait()
 }
