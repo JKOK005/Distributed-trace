@@ -10,6 +10,7 @@ import (
 var (
 	root_path_zk 	string 		= "distributed_trace"
 	node_path 		string 		= "nodes"
+	sink_path 		string 		= "sinks"
 	servers_zk 		[]string 	= []string{"localhost:2181"}
 	conn_timeout 	int 		= 10
 )
