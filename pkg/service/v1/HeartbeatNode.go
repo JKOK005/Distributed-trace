@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/samuel/go-zookeeper/zk"
 	"google.golang.org/grpc"
 	"log"
 	"time"
@@ -36,18 +35,6 @@ func (wn HeartbeatNode) marshalAll(datas [][]byte)([]*HeartbeatNode, error) {
 		}else{nodes = append(nodes, marshalled)}
 	}
 	return nodes, nil
-}
-
-func (wn HeartbeatNode) newClient() (*SdClient, error) {
-	/* Registers node with ZK cluster */
-	log.Println("Registering to ZK cluster")
-	client := new(SdClient)
-	conn, _, err := zk.Connect(servers_zk, time.Duration(conn_timeout) * time.Second)
-	if err != nil {return nil, err}
-
-	log.Println("Successfully connected to ZK at", servers_zk)
-	client.conn = conn
-	return client, nil
 }
 
 func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
@@ -88,7 +75,7 @@ func (wn HeartbeatNode) dispatchList(nodes []*HeartbeatNode) error {
 }
 
 func (wn HeartbeatNode) Start() {
-	client, err := wn.newClient()
+	client, err := newClient()
 	if err != nil {log.Fatal(err)}
 
 	data, _ := json.Marshal(wn)

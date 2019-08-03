@@ -5,6 +5,7 @@ import (
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
 	"strings"
+	"time"
 )
 
 var (
@@ -22,6 +23,18 @@ type SdClient struct {
 }
 
 type GenericNode interface {}
+
+func newClient() (*SdClient, error) {
+	/* Registers node with ZK cluster */
+	log.Println("Creating client to ZK server", servers_zk)
+	client := new(SdClient)
+	conn, _, err := zk.Connect(servers_zk, time.Duration(conn_timeout) * time.Second)
+	if err != nil {return nil, err}
+
+	log.Println("Successfully connected to ZK at", servers_zk)
+	client.conn = conn
+	return client, nil
+}
 
 func (s SdClient) checkPathExists(path string) (bool, error) {
 	exists, _, err := s.conn.Exists(path)
