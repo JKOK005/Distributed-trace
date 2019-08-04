@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"math/rand"
 	pb "Distributed-trace/pkg/api/proto"
 )
@@ -9,13 +10,22 @@ type TransmitterNode struct {
 	ReportChannel 	chan *pb.TraceReport
 }
 
+var (
+	sinks_path = "sinks"
+)
+
+func (t TransmitterNode) getFullPath(from_path string) (string) {
+	if from_path == "" {return fmt.Sprintf("/%s/%s", root_path_zk, sinks_path)}
+	return fmt.Sprintf("/%s/%s/%s", root_path_zk, sinks_path, from_path)
+}
+
 func (t TransmitterNode) getSinkNodeAddrs() ([]string, error) {
 	/*
 		Gets a Sink Node Address dynamically from ZK cluster
 	*/
 	client, err := newClient()
 	if err != nil {return nil, err}
-	if node_paths, err := client.GetNodePaths(""); err == nil {
+	if node_paths, err := client.GetNodePaths(t.getFullPath("")); err == nil {
 		return node_paths, nil
 	}else {return nil, err}
 }

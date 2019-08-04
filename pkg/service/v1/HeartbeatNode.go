@@ -22,7 +22,7 @@ var (
 	heartbeatnode_path = "heart_beat_nodes"
 )
 
-func getFullPath(from_path string) (string) {
+func (wn HeartbeatNode) getFullPath(from_path string) (string) {
 	if from_path == "" {return fmt.Sprintf("/%s/%s", root_path_zk, heartbeatnode_path)}
 	return fmt.Sprintf("/%s/%s/%s", root_path_zk, heartbeatnode_path, from_path)
 }
@@ -88,16 +88,16 @@ func (wn HeartbeatNode) Start() {
 	if err != nil {log.Fatal(err)}
 
 	data, _ := json.Marshal(wn)
-	if err := client.RegisterEphemeralNode(getFullPath(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)), data); err != nil {log.Fatal(err)}
+	if err := client.RegisterEphemeralNode(wn.getFullPath(fmt.Sprintf("%s:%d", wn.My_address, wn.My_port)), data); err != nil {log.Fatal(err)}
 
 	for{
 		select {
 		case <- time.NewTicker(time.Duration(wn.Poll_interval) * time.Millisecond).C:
-			if node_paths, err := client.GetNodePaths(getFullPath("")); err != nil {
+			if node_paths, err := client.GetNodePaths(wn.getFullPath("")); err != nil {
 				log.Println(err)
 			} else {
 				for _, node_path := range node_paths {
-					if unmarshalled_node, err := client.GetNodeValue(getFullPath(node_path)); err != nil {
+					if unmarshalled_node, err := client.GetNodeValue(wn.getFullPath(node_path)); err != nil {
 						log.Println(err)
 					} else {
 						marshalled_node, _ := wn.marshalOne(unmarshalled_node)
