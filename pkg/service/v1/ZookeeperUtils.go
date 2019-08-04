@@ -22,7 +22,7 @@ type SdClient struct {
 
 type GenericNode interface {}
 
-func newClient() (*SdClient, error) {
+func newZkClient() (*SdClient, error) {
 	/* Registers node with ZK cluster */
 	log.Println("Creating client to ZK server", servers_zk)
 	client := new(SdClient)

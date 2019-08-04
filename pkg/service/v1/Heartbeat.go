@@ -90,7 +90,7 @@ func (wn HeartbeatNode) dispatchList(nodes []*HeartbeatNode) error {
 }
 
 func (wn HeartbeatNode) Start() {
-	client, err := newClient()
+	client, err := newZkClient()
 	if err != nil {log.Fatal(err)}
 
 	data, _ := json.Marshal(wn)
