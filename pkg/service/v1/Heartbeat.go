@@ -68,10 +68,16 @@ func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
 		}else {
 			// Request succeeded
 			if err != nil {
-				log.Println(err)
+				reportChannel <- &pb.TraceReport{FromHostAddr: fmt.Sprintf("%s:%d", wn.My_address, wn.My_port),
+												ToHostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port),
+												ResponseTiming: uint32(0),
+												IsTransmissionSuccess:false}
 			} else {
 				end := time.Now()
-				log.Println(fmt.Sprintf("Response received in %d ns", end.Nanosecond() - start.Nanosecond()))
+				reportChannel <- &pb.TraceReport{FromHostAddr: fmt.Sprintf("%s:%d", wn.My_address, wn.My_port),
+												ToHostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port),
+												ResponseTiming: uint32(end.Nanosecond() - start.Nanosecond()),
+												IsTransmissionSuccess:true}
 			}
 		}
 	}

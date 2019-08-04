@@ -41,5 +41,7 @@ func main() {
 							Poll_interval: poll_interval,
 							}.Start()
 
+	go pkg.TransmitterNode{}.Start()
+
 	wg.Wait()
 }
