@@ -11,21 +11,11 @@ message PingMsgResp {
 
 message TraceReport {
 	string fromHostAddr = 1;
-	uint32 fromHostMsgTimeNano = 2;
 	string toHostAddr = 3;
-	uint32 toHostMsgTimeNano = 4;
+	uint32 responseTiming = 4;
 	bool isTransmissionSuccess = 6;
-}
-
-message TraceReportResp {
-	bool isSuccess = 1;
 }
 
 service WorkerService {
 	rpc PingNode(PingMsg) returns (PingMsgResp);
-}
-
-service TransmitterService {
-	rpc PingNode(PingMsg) returns (PingMsgResp);
-	rpc ReportNodeCheck(TraceReport) returns (TraceReportResp);
 }
