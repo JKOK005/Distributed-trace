@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	kafka_topic 			= "distributedTrace"
-	kafka_consumer_group 	= "distributed_trace_grp"
-	kafka_bootstrap_servers = "localhost:9092"
+	kafka_topic 			= getEnvStr("KAFKA_TOPIC", "distributedTrace")
+	kafka_consumer_group 	= getEnvStr("KAFKA_CONSUMER_GROUP", "distributed_trace_grp")
+	kafka_bootstrap_servers = getEnvStr("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 )
 
 type Kclient struct {

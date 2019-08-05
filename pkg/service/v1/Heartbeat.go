@@ -18,8 +18,8 @@ type HeartbeatNode struct {
 }
 
 var (
-	reportChannel = make(chan *pb.TraceReport)
-	heartbeatnode_path = "heart_beat_nodes"
+	reportChannel 		= make(chan *pb.TraceReport)
+	heartbeatnode_path 	= getEnvStr("HEART_BEAT_NODE_PATH","heart_beat_nodes")
 )
 
 func (wn HeartbeatNode) getFullPath(from_path string) (string) {
