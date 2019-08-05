@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	root_path_zk 		string 		= "distributed_trace"
-	sink_path 			string 		= "sinks"
-	servers_zk 			[]string 	= []string{"localhost:2181"}
-	conn_timeout 		int 		= 10
+	root_path_zk 		string 		= getEnvStr("ROOT_PATH_ZK", "distributed_trace")
+	sink_path 			string 		= getEnvStr("SINK_PATH", "sinks")
+	servers_zk 			[]string 	= getEnvStrSlice("SERVERS_ZK", []string{"localhost:2181"})
+	conn_timeout 		int 		= getEnvInt("SINK_PATH", 10)
 )
 
 type SdClient struct {
