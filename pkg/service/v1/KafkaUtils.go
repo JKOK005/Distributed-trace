@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"github.com/golang/protobuf/proto"
-	pb "Distributed-trace/pkg/api/proto"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"time"
 )
@@ -37,9 +35,3 @@ func (k Kclient) dispatch(payload []byte) error {
 					Headers:        nil,
 				}, nil)
 	}
-
-func (k Kclient) Dispatch(payload *pb.TraceReport) error {
-	if data, err := proto.Marshal(payload); err != nil {
-		return err
-	} else {return k.dispatch(data)}
-}
