@@ -11,7 +11,7 @@ var (
 	root_path_zk 		string 		= getEnvStr("ROOT_PATH_ZK", "distributed_trace")
 	sink_path 			string 		= getEnvStr("SINK_PATH", "sinks")
 	servers_zk 			[]string 	= getEnvStrSlice("SERVERS_ZK", []string{"localhost:2181"})
-	conn_timeout 		int 		= getEnvInt("SINK_PATH", 10)
+	conn_timeout 		int 		= getEnvInt("CONN_TIMEOUT", 10)
 )
 
 type SdClient struct {
