@@ -2,7 +2,7 @@ package main
 
 import (
 	pkg "Distributed-trace/pkg/service/v1"
-	"flag"
+	com "Distributed-trace/pkg/service/v1"
 	"fmt"
 	"sync"
 )
@@ -17,14 +17,13 @@ const (
 )
 
 var (
-	node_addr    *string
-	node_port 	 *int
+	node_addr    string
+	node_port 	 int
 )
 
 func init() {
-	node_addr = flag.String("address", "localhost", "Public node address")
-	node_port = flag.Int("port", 8000, "Public node port")
-	flag.Parse()
+	node_addr = com.GetEnvStr("REGISTER_PUBLIC_DNS","localhost")
+	node_port = com.GetEnvInt("REGISTER_PUBLIC_PORT", 1111)
 }
 
 func main() {
@@ -33,10 +32,10 @@ func main() {
 
 	wg.Add(1)
 
-	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", *node_addr, *node_port)}.RegisterListener()
+	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", "localhost", node_port)}.RegisterListener()
 
-	go pkg.HeartbeatNode {	My_address: *node_addr,
-							My_port: *node_port,
+	go pkg.HeartbeatNode {	My_address: node_addr,
+							My_port: node_port,
 							Poll_timeout: poll_timeout,
 							Poll_interval: poll_interval,
 							}.Start()

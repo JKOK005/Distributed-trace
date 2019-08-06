@@ -11,3 +11,5 @@ KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
 
 # Heart beat node
 HEART_BEAT_NODE_PATH="heart_beat_nodes"
+REGISTER_PUBLIC_DNS="localhost"
+REGISTER_PUBLIC_PORT=1111

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getEnvStr(key, defaultValue string) string {
+func GetEnvStr(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
 		return defaultValue
@@ -14,7 +14,7 @@ func getEnvStr(key, defaultValue string) string {
 	return value
 }
 
-func getEnvInt(key string, defaultValue int) int {
+func GetEnvInt(key string, defaultValue int) int {
 	value := os.Getenv(key)
 	if len(value) == 0 {
 		return defaultValue
@@ -23,7 +23,7 @@ func getEnvInt(key string, defaultValue int) int {
 	return valueInt
 }
 
-func getEnvStrSlice(key string, defaultValue []string) []string {
+func GetEnvStrSlice(key string, defaultValue []string) []string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
 		return defaultValue
