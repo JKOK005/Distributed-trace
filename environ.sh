@@ -12,4 +12,4 @@ export KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
 # Heart beat node
 export HEART_BEAT_NODE_PATH="heart_beat_nodes"
 export REGISTER_PUBLIC_DNS="localhost"
-export REGISTER_PUBLIC_PORT=1112
+export REGISTER_PUBLIC_PORT=4000

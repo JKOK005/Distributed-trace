@@ -23,7 +23,7 @@ var (
 
 func init() {
 	node_addr = com.GetEnvStr("REGISTER_PUBLIC_DNS","localhost")
-	node_port = com.GetEnvInt("REGISTER_PUBLIC_PORT", 1111)
+	node_port = com.GetEnvInt("REGISTER_PUBLIC_PORT", 4000)
 }
 
 func main() {
