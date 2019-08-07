@@ -63,8 +63,8 @@ func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
 		_, err := client.PingNode(ctx, &pb.PingMsg{HostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port)})
 
 		if ctx.Err() == context.DeadlineExceeded {
-		// Request timed out. Report as timeout.
-		log.Println("Request timed out: ", ctx.Err())
+			// Request timed out. Report as timeout.
+			log.Println("Request timed out: ", ctx.Err())
 		}else {
 			// Request succeeded
 			if err != nil {
@@ -72,12 +72,14 @@ func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
 												ToHostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port),
 												ResponseTiming: uint32(0),
 												IsTransmissionSuccess:false}
+				log.Println(fmt.Sprintf("PingNode attempt to %s/%d failed. Reporting status to sink.", node.My_address, node.My_port))
 			} else {
 				end := time.Now()
 				reportChannel <- &pb.TraceReport{FromHostAddr: fmt.Sprintf("%s:%d", wn.My_address, wn.My_port),
 												ToHostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port),
 												ResponseTiming: uint32(end.Nanosecond() - start.Nanosecond()),
 												IsTransmissionSuccess:true}
+				log.Println(fmt.Sprintf("PingNode attempt to %s/%d succeeded. Reporting status to sink.", node.My_address, node.My_port))
 			}
 		}
 	}
