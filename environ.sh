@@ -6,7 +6,7 @@ CONN_TIMEOUT=10
 
 # Kafka
 KAFKA_TOPIC="distributedTrace"
-KAFKA_CONSUMER_GROUP="distributed_trace_grp"
+KAFKA_PRODUCER_GROUP="distributed_trace_grp"
 KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
 
 # Heart beat node

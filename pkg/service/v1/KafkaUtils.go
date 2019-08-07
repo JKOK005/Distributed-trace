@@ -7,7 +7,7 @@ import (
 
 var (
 	kafka_topic 			= GetEnvStr("KAFKA_TOPIC", "distributedTrace")
-	kafka_consumer_group 	= GetEnvStr("KAFKA_CONSUMER_GROUP", "distributed_trace_grp")
+	kafka_producer_group 	= GetEnvStr("KAFKA_PRODUCER_GROUP", "distributed_trace_grp")
 	kafka_bootstrap_servers = GetEnvStr("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 )
 
@@ -18,7 +18,7 @@ type Kclient struct {
 func newKafkaProducerClient() (*Kclient, error) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers" : kafka_bootstrap_servers,
-		"group.id" : kafka_consumer_group,
+		"group.id" : kafka_producer_group,
 	})
 	if err != nil {return nil, err}
 	return &Kclient{conn: p}, nil
