@@ -32,7 +32,7 @@ func main() {
 
 	wg.Add(1)
 
-	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", "localhost", node_port)}.RegisterListener()
+	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", node_addr, node_port)}.RegisterListener()
 
 	go pkg.HeartbeatNode {	My_address: node_addr,
 							My_port: node_port,

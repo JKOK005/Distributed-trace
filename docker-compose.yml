@@ -1,0 +1,56 @@
+version: "3"
+services:
+  heartbeat-node-1:
+    container_name: heartbeat_1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      ROOT_PATH_ZK: distributed_trace
+      SINK_PATH: sinks
+      SERVERS_ZK: dt_zookeeper:2181
+      CONN_TIMEOUT: 10
+      KAFKA_TOPIC: distributedTrace
+      KAFKA_PRODUCER_GROUP: distributed_trace_grp
+      KAFKA_BOOTSTRAP_SERVERS: dt_kafka:9092
+      HEART_BEAT_NODE_PATH: heart_beat_nodes
+      REGISTER_PUBLIC_DNS: heartbeat_1
+      REGISTER_PUBLIC_PORT: 4000
+
+  heartbeat-node-2:
+    container_name: heartbeat_2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      ROOT_PATH_ZK: distributed_trace
+      SINK_PATH: sinks
+      SERVERS_ZK: dt_zookeeper:2181
+      CONN_TIMEOUT: 10
+      KAFKA_TOPIC: distributedTrace
+      KAFKA_PRODUCER_GROUP: distributed_trace_grp
+      KAFKA_BOOTSTRAP_SERVERS: dt_kafka:9092
+      HEART_BEAT_NODE_PATH: heart_beat_nodes
+      REGISTER_PUBLIC_DNS: heartbeat_2
+      REGISTER_PUBLIC_PORT: 4000
+
+  zookeeper:
+    container_name: dt_zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181"
+
+  kafka:
+    container_name: dt_kafka
+    image: wurstmeister/kafka
+    ports:
+      - "9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: dt_kafka
+      KAFKA_ZOOKEEPER_CONNECT: dt_zookeeper:2181
