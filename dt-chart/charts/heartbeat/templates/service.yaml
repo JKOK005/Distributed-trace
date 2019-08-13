@@ -1,0 +1,18 @@
+{{ range $node := .Values.nodes}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-{{ $node }}
+  labels:
+    target.worker.node: {{ $node }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ $.Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    target.worker.node: {{ $node }}
+---
+{{ end }}

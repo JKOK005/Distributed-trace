@@ -1,0 +1,35 @@
+{{ range $node := .Values.nodes}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Deployment-{{ $node }}
+  labels:
+    target.worker.node: {{ $node }}
+spec:
+  replicas: {{ $.Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      target.worker.node: {{ $node }}
+  template:
+    metadata:
+      labels:
+        target.worker.node: {{ $node }}
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}-{{ $node }}
+          image: {{ $.Values.deployment.repository }}:{{ $.Values.deployment.tag }}
+          imagePullPolicy: {{ $.Values.deployment.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+{{ end }}
