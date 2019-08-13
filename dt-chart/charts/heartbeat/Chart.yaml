@@ -3,3 +3,4 @@ appVersion: "1.0"
 description: Heartbeat nodes chart
 name: heartbeat
 version: 0.1.0
+namespace: distributed-trace

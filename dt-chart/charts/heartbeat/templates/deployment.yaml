@@ -19,6 +19,17 @@ spec:
         - name: {{ $.Chart.Name }}-{{ $node }}
           image: {{ $.Values.deployment.repository }}:{{ $.Values.deployment.tag }}
           imagePullPolicy: {{ $.Values.deployment.pullPolicy }}
+          env:
+            {{- range $each := $.Values.deployment.env }}
+            - name:   {{ $each.name }}
+              value:  {{ $each.value }}
+            {{- end }}
+            - name:   REGISTER_PUBLIC_DNS
+              value:  service-{{ $node }}.{{ $.Release.Namespace }}
+            - name:   SERVERS_ZK
+              value:  ???
+            - name:   KAFKA_BOOTSTRAP_SERVERS
+              value:  ???
           ports:
             - name: http
               containerPort: 80
