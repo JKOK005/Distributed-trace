@@ -25,11 +25,11 @@ spec:
               value:  {{ $each.value }}
             {{- end }}
             - name:   REGISTER_PUBLIC_DNS
-              value:  service-{{ $node }}.{{ $.Release.Namespace }}
+              value:  service-{{ $node }}.{{ $.Release.Namespace }}.svc.cluster.local
             - name:   SERVERS_ZK
-              value:  ???
+              value:  service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local
             - name:   KAFKA_BOOTSTRAP_SERVERS
-              value:  ???
+              value:  service-kafka.{{ $.Release.Namespace }}.svc.cluster.local
           ports:
             - name: http
               containerPort: 80
