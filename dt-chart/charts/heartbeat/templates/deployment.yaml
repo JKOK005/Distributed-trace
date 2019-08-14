@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Deployment-{{ $node }}
+  name: deployment-{{ $node }}
   labels:
     target.worker.node: {{ $node }}
 spec:
@@ -22,14 +22,14 @@ spec:
           env:
             {{- range $each := $.Values.deployment.env }}
             - name:   {{ $each.name }}
-              value:  {{ $each.value }}
+              value:  "{{ $each.value }}"
             {{- end }}
             - name:   REGISTER_PUBLIC_DNS
-              value:  service-{{ $node }}.{{ $.Release.Namespace }}.svc.cluster.local
+              value:  "service-{{ $node }}.{{ $.Release.Namespace }}.svc.cluster.local"
             - name:   SERVERS_ZK
-              value:  service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local
+              value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
             - name:   KAFKA_BOOTSTRAP_SERVERS
-              value:  service-kafka.{{ $.Release.Namespace }}.svc.cluster.local
+              value:  "service-kafka.{{ $.Release.Namespace }}.svc.cluster.local:9092"
           ports:
             - name: http
               containerPort: 80

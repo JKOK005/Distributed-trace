@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kafka.fullname" . }}
+  name: deployment-kafka
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -16,6 +16,11 @@ spec:
         - name: deployment-kafka-pod
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name:   KAFKA_ADVERTISED_HOST_NAME
+              value:  "service-kafka.{{ $.Release.Namespace }}.svc.cluster.local"
+            - name:   KAFKA_ZOOKEEPER_CONNECT
+              value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
           ports:
             - name: http
               containerPort: 80
