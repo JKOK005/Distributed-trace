@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Deployment-zookeeper
+  name: {{ include "kafka.fullname" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: dt-zookeeper
+      app.kubernetes.io/name: dt-kafka
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: dt-zookeeper
+        app.kubernetes.io/name: dt-kafka
     spec:
       containers:
-        - name: deployment-zookeeper-pod
+        - name: deployment-kafka-pod
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
