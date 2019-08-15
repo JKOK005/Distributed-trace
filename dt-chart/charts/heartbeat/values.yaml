@@ -4,7 +4,7 @@ fullnameOverride:   ""
 deployment:
   repository: jkok005/distributed-trace
   tag: staging
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   replicaCount: 1
   env:
     - name:   ROOT_PATH_ZK
@@ -19,12 +19,10 @@ deployment:
       value:  distributed_trace_grp
     - name:   HEART_BEAT_NODE_PATH
       value:  heart_beat_nodes
-    - name:   REGISTER_PUBLIC_PORT
-      value:  4000
 
 service:
   type: ClusterIP
-  port: 80
+  port: 4000
 
 nodes:
   - node1

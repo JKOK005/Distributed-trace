@@ -26,21 +26,19 @@ spec:
             {{- end }}
             - name:   REGISTER_PUBLIC_DNS
               value:  "service-{{ $node }}.{{ $.Release.Namespace }}.svc.cluster.local"
+            - name:   REGISTER_PUBLIC_PORT
+              value:  "4000"
+            - name:   REGISTER_LISTENER_DNS
+              value:  "0.0.0.0"
+            - name:   REGISTER_LISTENER_PORT
+              value:  "4000"
             - name:   SERVERS_ZK
               value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
             - name:   KAFKA_BOOTSTRAP_SERVERS
               value:  "service-kafka.{{ $.Release.Namespace }}.svc.cluster.local:9092"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 4000
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
 ---
 {{ end }}

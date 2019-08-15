@@ -23,13 +23,5 @@ spec:
               value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 9092
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http

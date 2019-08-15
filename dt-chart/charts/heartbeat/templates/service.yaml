@@ -9,7 +9,7 @@ spec:
   type: {{ $.Values.service.type }}
   ports:
     - port: {{ $.Values.service.port }}
-      targetPort: 80
+      targetPort: 4000
       protocol: TCP
   selector:
     target.worker.node: {{ $node }}

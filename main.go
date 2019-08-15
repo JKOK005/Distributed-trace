@@ -17,13 +17,17 @@ const (
 )
 
 var (
-	node_addr    string
-	node_port 	 int
+	node_addr    	string
+	node_port 	 	int
+	listener_addr   string
+	listener_port 	int
 )
 
 func init() {
-	node_addr = com.GetEnvStr("REGISTER_PUBLIC_DNS","localhost")
-	node_port = com.GetEnvInt("REGISTER_PUBLIC_PORT", 4000)
+	listener_addr 	= com.GetEnvStr("REGISTER_LISTENER_DNS","localhost")
+	listener_port 	= com.GetEnvInt("REGISTER_LISTENER_PORT",4000)
+	node_addr 		= com.GetEnvStr("REGISTER_PUBLIC_DNS","localhost")
+	node_port 		= com.GetEnvInt("REGISTER_PUBLIC_PORT", 4000)
 }
 
 func main() {
@@ -32,7 +36,7 @@ func main() {
 
 	wg.Add(1)
 
-	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", node_addr, node_port)}.RegisterListener()
+	go pkg.NodeListener {Address:fmt.Sprintf("%s:%d", listener_addr, listener_port)}.RegisterListener()
 
 	go pkg.HeartbeatNode {	My_address: node_addr,
 							My_port: node_port,

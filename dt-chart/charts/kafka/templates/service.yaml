@@ -6,7 +6,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 80
+      targetPort: 9092
       protocol: TCP
   selector:
     app.kubernetes.io/name: dt-kafka
