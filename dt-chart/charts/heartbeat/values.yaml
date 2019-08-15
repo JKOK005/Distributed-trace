@@ -2,7 +2,7 @@ nameOverride:   ""
 fullnameOverride:   ""
 
 deployment:
-  repository: distributed_trace/v1
+  repository: jkok005/distributed-trace
   tag: staging
   pullPolicy: IfNotPresent
   replicaCount: 1
