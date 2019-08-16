@@ -35,7 +35,7 @@ spec:
             - name:   SERVERS_ZK
               value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
             - name:   KAFKA_BOOTSTRAP_SERVERS
-              value:  "service-kafka.{{ $.Release.Namespace }}.svc.cluster.local:9092"
+              value:  "moldy-koala-kafka.{{ $.Release.Namespace }}.svc.cluster.local:9092"
           ports:
             - name: http
               containerPort: 4000

@@ -24,4 +24,25 @@ docker-compose -f docker-compose.yml up
 
 Docker compose will spin up 2 heart beat nodes, 1 ZK node and 1 Kafka standalone node containing 1 broker.
 
-To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic _distributedTrace_ 
+To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic _distributedTrace
+
+### Helm charts
+Start the Confluent-Kafka chart
+```dockerfile
+helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+
+helm install --name my-kafka incubator/kafka
+```
+
+Note the service name for Kafka
+```dockerfile
+kubectl get svc # Note service name 
+
+# Modify the value for KAFKA_BOOTSTRAP_SERVERS in heartbeat chart deployment
+value:  "<Service name>.{{ $.Release.Namespace }}.svc.cluster.local:9092"
+```
+
+There after, start distributed trace helm chart
+``` dockerfile
+helm install dt-chart --name distributed-trace
+```
