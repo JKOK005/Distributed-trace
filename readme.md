@@ -1,6 +1,17 @@
-### Distributed trace
+## Distributed trace
+Distributed trace aims to track inter-node network performance across a cluster of machines.
 
-#### Dependencies
+This is motivated mostly by the nature of distributed workload across a cluster of machines.
+A cluster compromises of different worker nodes with a single master node.
+Each worker node can be located under different locality zones or have individual network policies enforced around it.
+Moreover, each node can have different instance group with different amount of bandwidth.
+
+The implementation of distributed trace closely follows a work done by [Microsoft](https://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p139.pdf).
+
+At present, we deploy a heartbeat agent to each node in the cluster. The agent is responsible for discovering all nodes within the cluster and reporting the time taken to issue pings to all other nodes within the cluster.
+
+## Installation & deployment
+#### Ensure that all dependencies are installed 
 Install [go Kafka-client](https://github.com/confluentinc/confluent-kafka-go) from Confluent 
 - Follow instructions listed in the link
 
@@ -16,9 +27,9 @@ Compile protobuf schema via:
 protoc -I api/proto/v1/ --go_out=plugins=grpc:pkg/api/proto/ api/proto/v1/messages.proto
 ```
 
-### Execution
+### Deploying locally via docker compose
 To start the execution, run 
-```dockerfile
+```shell script
 docker-compose -f docker-compose.yml up
 ```
 
@@ -26,23 +37,26 @@ Docker compose will spin up 2 heart beat nodes, 1 ZK node and 1 Kafka standalone
 
 To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic _distributedTrace
 
-### Helm charts
-Start the Confluent-Kafka chart
-```dockerfile
-helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+### Deploying locally via minikube
+Alternatively, we can deploy the application onto a local minikube cluster:
 
-helm install --name my-kafka incubator/kafka
+Start minikube server
+```shell script
+minikube start
 ```
 
-Note the service name for Kafka
-```dockerfile
-kubectl get svc # Note service name 
+Start the Confluent-Kafka chart first
+```shell script
+helm install --name service-kafka helm-charts/kafka
+```
 
+If your `--name` flag is set to another value, ensure that you update the value of KAFKA_BOOTSTRAP_SERVERS in heartbeat chart deployment
+```shell script
 # Modify the value for KAFKA_BOOTSTRAP_SERVERS in heartbeat chart deployment
-value:  "<Service name>.{{ $.Release.Namespace }}.svc.cluster.local:9092"
+value:  "<name>.{{ $.Release.Namespace }}.svc.cluster.local:9092"
 ```
 
 There after, start distributed trace helm chart
-``` dockerfile
-helm install dt-chart --name distributed-trace
+``` shell script
+helm install --name distributed-trace helm-charts/dt-chart
 ```
