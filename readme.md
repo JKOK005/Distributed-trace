@@ -60,3 +60,14 @@ There after, start distributed trace helm chart
 ``` shell script
 helm install --name distributed-trace helm-charts/dt-chart
 ```
+
+In deployments to Minikube, you will encounter an issue where the pod is unable to ping its own service. 
+This is an existing bug in minikube as of version 1.3.1.
+
+Reference can be found [here](https://github.com/kubernetes/minikube/issues/1568) 
+
+The work around is to do this:
+```shell script
+minikube ssh
+sudo ip link set docker0 promisc on
+```
