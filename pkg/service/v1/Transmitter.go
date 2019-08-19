@@ -23,9 +23,16 @@ func (t TransmitterNode) dispatch(payload *pb.TraceReport) error {
 	/*
 		Attempts to send received msgs to Kafka
 	*/
-	if str, err := t.protoToString(payload); err != nil {
+	if str, err := t.protoToString(payload); err == nil {
+		if err = kafkaClient.dispatch([]byte(str)); err != nil {
+			log.Println("Error with dispatch to Kafka: ", err)
+			return err
+		}
+	} else {
+		log.Println("Error with dispatch to Kafka: ", err)
 		return err
-	}else {return kafkaClient.dispatch([]byte(str))}
+	}
+	return nil
 }
 
 func (t TransmitterNode) Start() {
