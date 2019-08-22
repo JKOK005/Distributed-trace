@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-{{ $node }}
+  name: deployment-{{ $node.podName }}
   labels:
-    target.worker.node: {{ $node }}
+    target.worker.node: {{ $node.podName }}
 spec:
   replicas: {{ $.Values.deployment.replicaCount }}
   selector:
     matchLabels:
-      target.worker.node: {{ $node }}
+      target.worker.node: {{ $node.podName }}
   template:
     metadata:
       labels:
-        target.worker.node: {{ $node }}
+        target.worker.node: {{ $node.podName }}
     spec:
       containers:
-        - name: {{ $.Chart.Name }}-{{ $node }}
+        - name: {{ $.Chart.Name }}-{{ $node.podName }}
           image: {{ $.Values.deployment.repository }}:{{ $.Values.deployment.tag }}
           imagePullPolicy: {{ $.Values.deployment.pullPolicy }}
           env:
@@ -25,7 +25,7 @@ spec:
               value:  "{{ $each.value }}"
             {{- end }}
             - name:   REGISTER_PUBLIC_DNS
-              value:  "service-{{ $node }}.{{ $.Release.Namespace }}.svc.cluster.local"
+              value:  "service-{{ $node.podName }}.{{ $.Release.Namespace }}.svc.cluster.local"
             - name:   REGISTER_PUBLIC_PORT
               value:  "4000"
             - name:   REGISTER_LISTENER_DNS
@@ -40,5 +40,7 @@ spec:
             - name: http
               containerPort: 4000
               protocol: TCP
+      nodeSelector:
+        nodeLabel: {{ $node.nodeLabel }}
 ---
 {{ end }}

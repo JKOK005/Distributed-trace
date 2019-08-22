@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: service-{{ $node }}
+  name: service-{{ $node.podName }}
   labels:
-    target.worker.node: {{ $node }}
+    target.worker.node: {{ $node.podName }}
 spec:
   type: {{ $.Values.service.type }}
   ports:
@@ -12,6 +12,6 @@ spec:
       targetPort: 4000
       protocol: TCP
   selector:
-    target.worker.node: {{ $node }}
+    target.worker.node: {{ $node.podName }}
 ---
 {{ end }}
