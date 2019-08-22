@@ -25,9 +25,6 @@ service:
   port: 4000
 
 nodes:
-  - podName:   node1
-    nodeLabel: minikube
-  - podName:   node2
-    nodeLabel: minikube
-  - podName:   node3
-    nodeLabel: minikube
+  - podName: node1
+  - podName: node2
+  - podName: node3
