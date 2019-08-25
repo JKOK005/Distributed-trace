@@ -24,7 +24,4 @@ service:
   type: ClusterIP
   port: 4000
 
-nodes:
-  - podName: node1
-  - podName: node2
-  - podName: node3
+nodes: 4

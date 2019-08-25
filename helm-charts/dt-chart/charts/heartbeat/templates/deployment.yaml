@@ -1,23 +1,23 @@
-{{ range $node := .Values.nodes}}
+{{ range $i, $e := until (.Values.nodes | int) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-{{ $node.podName }}
+  name: deployment-node{{ $i }}
   labels:
-    target.worker.node: {{ $node.podName }}
+    target.worker.node: node{{ $i }}
 spec:
   replicas: {{ $.Values.deployment.replicaCount }}
   selector:
     matchLabels:
-      target.worker.node: {{ $node.podName }}
+      target.worker.node: node{{ $i }}
   template:
     metadata:
       labels:
-        target.worker.node: {{ $node.podName }}
+        target.worker.node: node{{ $i }}
         app: heartbeat
     spec:
       containers:
-        - name: {{ $.Chart.Name }}-{{ $node.podName }}
+        - name: {{ $.Chart.Name }}-node{{ $i }}
           image: {{ $.Values.deployment.repository }}:{{ $.Values.deployment.tag }}
           imagePullPolicy: {{ $.Values.deployment.pullPolicy }}
           env:
@@ -26,7 +26,7 @@ spec:
               value:  "{{ $each.value }}"
             {{- end }}
             - name:   REGISTER_PUBLIC_DNS
-              value:  "service-{{ $node.podName }}.{{ $.Release.Namespace }}.svc.cluster.local"
+              value:  "service-node{{ $i }}.{{ $.Release.Namespace }}.svc.cluster.local"
             - name:   REGISTER_PUBLIC_PORT
               value:  "4000"
             - name:   REGISTER_LISTENER_DNS
