@@ -37,15 +37,12 @@ Docker compose will spin up 2 heart beat nodes, 1 ZK node and 1 Kafka standalone
 
 To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic _distributedTrace
 
-### Deploying locally via minikube
-Alternatively, we can deploy the application onto a local minikube cluster:
+### Deploying on to Kubernetes
+Alternatively, we can deploy the application onto a Kubernetes cluster via Helm charts.
+There are 2 helm charts that need to be deployed.
 
-Start minikube server
-```shell script
-minikube start
-```
-
-Start the Confluent-Kafka chart first
+#### Chart 1: Confluent Kafka Helm chart
+Start by deploying Kafka brokers
 ```shell script
 helm install --name service-kafka helm-charts/kafka
 ```
@@ -56,7 +53,17 @@ If your `--name` flag is set to another value, ensure that you update the value 
 value:  "<name>.{{ $.Release.Namespace }}.svc.cluster.local:9092"
 ```
 
-There after, start distributed trace helm chart
+#### Chart 2: Heartbeat agents & Zookeeper
+We have to define the number of nodes that is present in our Kubernetes cluster (excluding master).
+
+```yaml
+// Modify nodes parameter in helm-charts/dt-charts/heartbeat/values.yaml 
+// For a 4 node cluster, set
+
+nodes: 4
+```
+
+There after, deploy the heartbeat agents and Zookeeper cluster
 ``` shell script
 helm install --name distributed-trace helm-charts/dt-chart
 ```
@@ -71,3 +78,20 @@ The work around is to do this:
 minikube ssh
 sudo ip link set docker0 promisc on
 ```
+
+### Heartbeat agent parameters
+There are several parameters configurable in the heartbeat agent's deployment.yaml script
+
+| key | Description |
+| ------------- | ------------- |
+| ROOT_PATH_ZK              | Path relative to `/`. If ROOT_PATH_ZK=root and HEART_BEAT_NODE_PATH=nodes, then all heartbeat agents will register themselves under /root/nodes |
+| HEART_BEAT_NODE_PATH      | Path relative to `/ROOT_PATH_ZK` which heartbeat agents will register themselves at |
+| CONN_TIMEOUT              | Zookeeper timeout to initialize connection (**Seconds**) |
+| KAFKA_TOPIC               | Kafka topic to send ping results to |
+| KAFKA_PRODUCER_GROUP      | Kafka producer group for all heartbeat agents to register under |
+| REGISTER_PUBLIC_DNS       | Public url of heartbeat agents, which will be registered as a value in the Zookeeper node |
+| REGISTER_PUBLIC_PORT      | Public port of heartbeat agents, which will be registered as a value in the Zookeeper node |
+| REGISTER_LISTENER_DNS     | Internal url for heartbeat GRPC listener to listen to |
+| REGISTER_LISTENER_PORT    | Internal port for heartbeat GRPC listener to listen to |
+| SERVERS_ZK                | Url of Zookeeper server |
+| KAFKA_BOOTSTRAP_SERVERS   | Url of KAfka bootstrap servers |
