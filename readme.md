@@ -35,9 +35,9 @@ To start the execution, run
 docker-compose -f docker-compose.yml up
 ```
 
-Docker compose will spin up 2 heart beat nodes, 1 ZK node and 1 Kafka standalone node containing 1 broker.
+Docker compose will spin up 2 heart beat nodes, 1 Zookeeper node and 1 Kafka standalone node containing 1 broker.
 
-To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic _distributedTrace
+To mine the pinged data, we can spawn a consumer that listens to the Kafka container under the topic `distributedTrace`
 
 ### Deploying on to Kubernetes
 Alternatively, we can deploy the application onto a Kubernetes cluster via Helm charts.
@@ -59,9 +59,8 @@ value:  "<name>.{{ $.Release.Namespace }}.svc.cluster.local:9092"
 We have to define the number of nodes that is present in our Kubernetes cluster (excluding master).
 
 ```yaml
-// Modify nodes parameter in helm-charts/dt-charts/heartbeat/values.yaml 
-// For a 4 node cluster, set
-
+# Modify nodes parameter in helm-charts/dt-charts/heartbeat/values.yaml 
+# For a 4 node cluster, set
 nodes: 4
 ```
 
@@ -86,9 +85,9 @@ There are several parameters configurable in the heartbeat agent's deployment.ya
 
 | key | Description |
 | ------------- | ------------- |
-| ROOT_PATH_ZK              | Path relative to `/`. If ROOT_PATH_ZK=root and HEART_BEAT_NODE_PATH=nodes, then all heartbeat agents will register themselves under /root/nodes |
+| ROOT_PATH_ZK              | Path relative to `/`. If `ROOT_PATH_ZK=root` and `HEART_BEAT_NODE_PATH=nodes`, then all heartbeat agents will register themselves under /root/nodes |
 | HEART_BEAT_NODE_PATH      | Path relative to `/ROOT_PATH_ZK` which heartbeat agents will register themselves at |
-| CONN_TIMEOUT              | Zookeeper timeout to initialize connection (**Seconds**) |
+| CONN_TIMEOUT              | Zookeeper timeout to initialize connection (sec) |
 | KAFKA_TOPIC               | Kafka topic to send ping results to |
 | KAFKA_PRODUCER_GROUP      | Kafka producer group for all heartbeat agents to register under |
 | REGISTER_PUBLIC_DNS       | Public url of heartbeat agents, which will be registered as a value in the Zookeeper node |
