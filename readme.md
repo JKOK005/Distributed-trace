@@ -80,6 +80,21 @@ minikube ssh
 sudo ip link set docker0 promisc on
 ```
 
+### Mining the data
+The present implementation exposes all Kafka brokers as **ClusterIp**. In order to obtain the data in Kafka, we would have to exec into the pod to view it.
+
+```shell script
+kubectl get pods 
+kubectl exec -it <kafka-pod-name> -- /bin/bash
+```
+
+We can then poll a topic using
+```shell script
+kafka-console-consumer --topic distributedTrace --bootstrap-server {{ kafka-service-name }}.{{ namespace }}.svc.cluster.local:9092
+```
+
+*Note: Volume mounts have not been added when configuring the Helm chart for Kafka. This means that any data gathered will be lost if the broker pod dies or is restarted.*
+
 ### Heartbeat agent parameters
 There are several parameters configurable in the heartbeat agent's deployment.yaml script
 
@@ -95,4 +110,4 @@ There are several parameters configurable in the heartbeat agent's deployment.ya
 | REGISTER_LISTENER_DNS     | Internal url for heartbeat GRPC listener to listen to |
 | REGISTER_LISTENER_PORT    | Internal port for heartbeat GRPC listener to listen to |
 | SERVERS_ZK                | Url of Zookeeper server |
-| KAFKA_BOOTSTRAP_SERVERS   | Url of KAfka bootstrap servers |
+| KAFKA_BOOTSTRAP_SERVERS   | Url of Kafka bootstrap servers |
