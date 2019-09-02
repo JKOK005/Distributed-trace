@@ -1,4 +1,6 @@
 ## Distributed trace
+![](pictures/diagram.png)
+
 Distributed trace aims to track inter-node network performance across a cluster of machines.
 
 This is motivated mostly by the nature of distributed workload across a cluster of machines.
