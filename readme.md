@@ -93,6 +93,9 @@ We can then poll a topic using
 kafka-console-consumer --topic distributedTrace --bootstrap-server {{ kafka-service-name }}.{{ namespace }}.svc.cluster.local:9092
 ```
 
+If all goes well, the data should look like this (for a 4 node cluster)
+![](pictures/results.png)
+
 *Note: Volume mounts have not been added when configuring the Helm chart for Kafka. This means that any data gathered will be lost if the broker pod dies or is restarted.*
 
 ### Heartbeat agent parameters
