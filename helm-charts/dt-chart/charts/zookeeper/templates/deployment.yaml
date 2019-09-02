@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-zookeeper
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dt-zookeeper
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dt-zookeeper
+    spec:
+      containers:
+        - name: deployment-zookeeper-pod
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 2181
+              protocol: TCP

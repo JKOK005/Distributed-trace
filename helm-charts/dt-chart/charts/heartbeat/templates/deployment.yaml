@@ -1,0 +1,57 @@
+{{ range $i, $e := until (.Values.nodes | int) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-node{{ $i }}
+  labels:
+    target.worker.node: node{{ $i }}
+spec:
+  replicas: {{ $.Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      target.worker.node: node{{ $i }}
+  template:
+    metadata:
+      labels:
+        target.worker.node: node{{ $i }}
+        app: heartbeat
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}-node{{ $i }}
+          image: {{ $.Values.deployment.repository }}:{{ $.Values.deployment.tag }}
+          imagePullPolicy: {{ $.Values.deployment.pullPolicy }}
+          env:
+            {{- range $each := $.Values.deployment.env }}
+            - name:   {{ $each.name }}
+              value:  "{{ $each.value }}"
+            {{- end }}
+            - name:   REGISTER_PUBLIC_DNS
+              value:  "service-node{{ $i }}.{{ $.Release.Namespace }}.svc.cluster.local"
+            - name:   REGISTER_PUBLIC_PORT
+              value:  "4000"
+            - name:   REGISTER_LISTENER_DNS
+              value:  "0.0.0.0"
+            - name:   REGISTER_LISTENER_PORT
+              value:  "4000"
+            - name:   SERVERS_ZK
+              value:  "service-zookeeper.{{ $.Release.Namespace }}.svc.cluster.local:2181"
+            - name:   KAFKA_BOOTSTRAP_SERVERS
+              value:  "service-kafka.{{ $.Release.Namespace }}.svc.cluster.local:9092"
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - heartbeat
+              topologyKey: kubernetes.io/hostname
+---
+{{ end }}

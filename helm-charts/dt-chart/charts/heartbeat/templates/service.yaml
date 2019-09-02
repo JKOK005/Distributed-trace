@@ -1,0 +1,17 @@
+{{ range $i, $e := until (.Values.nodes | int) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-node{{ $i }}
+  labels:
+    target.worker.node: node{{ $i }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ $.Values.service.port }}
+      targetPort: 4000
+      protocol: TCP
+  selector:
+    target.worker.node: node{{ $i }}
+---
+{{ end }}

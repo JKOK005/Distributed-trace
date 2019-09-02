@@ -72,6 +72,8 @@ func (wn HeartbeatNode) dispatch(node *HeartbeatNode) error {
 												ToHostAddr: fmt.Sprintf("%s:%d", node.My_address, node.My_port),
 												ResponseTiming: uint32(0),
 												IsTransmissionSuccess:false}
+				log.Println(fmt.Sprint("PingNode attempt to %s/%d failed with error: %s. Reporting status to sink",
+											node.My_address, node.My_port, err))
 				log.Println(fmt.Sprintf("PingNode attempt to %s/%d failed. Reporting status to sink.", node.My_address, node.My_port))
 			} else {
 				end := time.Now()

@@ -1,0 +1,27 @@
+nameOverride:   ""
+fullnameOverride:   ""
+
+deployment:
+  repository: jkok005/distributed-trace
+  tag: staging
+  pullPolicy: Always
+  replicaCount: 1
+  env:
+    - name:   ROOT_PATH_ZK
+      value:  distributed_trace
+    - name:   SINK_PATH
+      value:  sinks
+    - name:   CONN_TIMEOUT
+      value:  10
+    - name:   KAFKA_TOPIC
+      value:  distributedTrace
+    - name:   KAFKA_PRODUCER_GROUP
+      value:  distributed_trace_grp
+    - name:   HEART_BEAT_NODE_PATH
+      value:  heart_beat_nodes
+
+service:
+  type: ClusterIP
+  port: 4000
+
+nodes: 4

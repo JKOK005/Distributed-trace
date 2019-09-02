@@ -1,0 +1,19 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: wurstmeister/zookeeper
+  tag: 3.4.6
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 2181
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

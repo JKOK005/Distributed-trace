@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-zookeeper
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 2181
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: dt-zookeeper
